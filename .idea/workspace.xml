@@ -7,7 +7,9 @@
     <option name="reloaded" value="true" />
   </component>
   <component name="CMakeRunConfigurationManager">
-    <generated />
+    <generated>
+      <config projectName="Files_A1" targetName="Files_A1" />
+    </generated>
   </component>
   <component name="CMakeSettings">
     <configurations>
@@ -16,7 +18,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe2eed22-5c59-4499-a7bc-aaf583cec4d6" name="Changes" comment="adding main and the structure of the program">
-      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +58,11 @@
   }
 }</component>
   <component name="RunManager">
+    <configuration name="Files_A1" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Files_A1" TARGET_NAME="Files_A1" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Files_A1" RUN_TARGET_NAME="Files_A1">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -71,6 +79,8 @@
       <updated>1700766259822</updated>
       <workItem from="1700766261440" duration="111000" />
       <workItem from="1700766473938" duration="150000" />
+      <workItem from="1700766656834" duration="23000" />
+      <workItem from="1700766690875" duration="1000" />
     </task>
     <task id="LOCAL-00001" summary="adding main and the structure of the program">
       <created>1700766344248</created>
