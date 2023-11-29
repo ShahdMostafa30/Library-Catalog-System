@@ -104,8 +104,7 @@ bool getAuthorByID(int id, fstream &indexFile) {
 
 // A function that takes the ISBN as a parameter and binary search for the ISBN in the PrimaryIndexBook file
 bool getBookByISBN(int isbn, fstream &indexFile) {
-    // open the PrimaryIndexAuthor file in the read mode
-    // count the number of records in the PrimaryIndexAuthor file
+    // count the number of records in the PrimaryIndexBook file
     int count = 0;
     string line;
     while (getline(indexFile, line))
@@ -119,14 +118,20 @@ bool getBookByISBN(int isbn, fstream &indexFile) {
     // store records into a map to sort them
     vector<pair<int, int>> records;
     for(int i = 0; i < count; i++) {
-        if(getline(indexFile, line)) {
+        if (getline(indexFile, line)) {
             int currentISBN, currentOffset;
-            // before the space is the id
-            // after the space is the offset
-            currentISBN = stoi(line.substr(0, line.find(' ')));
-            currentOffset = stoi(line.substr(line.find(' ') + 1));
-            // insert the record into the map
-            records.emplace_back(currentISBN, currentOffset);
+            string temp = line.substr(0, line.find(' '));
+            string temp2 = line.substr(line.find(' ') + 1);
+
+            try {
+                currentISBN = stoi(temp);
+                currentOffset = stoi(temp2);
+                records.emplace_back(currentISBN, currentOffset);
+            } catch (const std::exception& e) {
+                cerr << "Error converting line " << i + 1 << ": " << e.what() << endl;
+                // Handle or skip this line as needed
+                continue; // Skip to the next iteration
+            }
         }
     }
     indexFile.close();
