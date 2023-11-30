@@ -9,21 +9,20 @@ using namespace std;
 //For Linked List -> LLAuthor ->(#, ID(for author), Pointer)
 //                -> LLBook   ->(#, ID(for book), Pointer)
 
-bool getAuthorByID(int id, fstream &indexFile); // search for the author by id and print the author record
-bool getBookByISBN(int isbn, fstream &indexFile); // search for the book by isbn and print the book record
+long long getAuthorByID(int id, fstream &indexFile); // search for the author by id and print the author record
+long long getBookByISBN(int isbn, fstream &indexFile); // search for the book by isbn and print the book record
 
 
 int main() {
-
-    fstream primary("PrimaryIndexBook.txt", ios::in);
+    fstream primary("PrimaryIndexAuthor.txt", ios::in);
     int n; cin >> n;
-    getBookByISBN(n, primary);
+    cout << getAuthorByID(n, primary);
     primary.close();
     return 0;
 }
 // A function that takes the authorID as a parameter and binary search for the authorID in the PrimaryIndexAuthor file
 // and get the offset of the author record then seek to the offset in the Author file and read the author record
-bool getAuthorByID(int id, fstream &indexFile) {
+long long getAuthorByID(int id, fstream &indexFile) {
         // open the PrimaryIndexAuthor file in the read mode
         // count the number of records in the PrimaryIndexAuthor file
         int count = 0;
@@ -53,7 +52,7 @@ bool getAuthorByID(int id, fstream &indexFile) {
 
         // binary search for the id
         int left = 0, right = count-1, mid;
-        int offset;
+        int offset = -1;
         bool found = false;
         while(left <= right) {
             mid = left + (right - left) / 2;
@@ -99,11 +98,11 @@ bool getAuthorByID(int id, fstream &indexFile) {
         else {
             cout << "Author is NOT found!" << endl;
         }
-    return found;
+    return offset;
 }
 
 // A function that takes the ISBN as a parameter and binary search for the ISBN in the PrimaryIndexBook file
-bool getBookByISBN(int isbn, fstream &indexFile) {
+long long getBookByISBN(int isbn, fstream &indexFile) {
     // count the number of records in the PrimaryIndexBook file
     int count = 0;
     string line;
@@ -138,7 +137,7 @@ bool getBookByISBN(int isbn, fstream &indexFile) {
 
     // binary search for the id
     int left = 0, right = count-1, mid;
-    int offset;
+    int offset = -1;
     bool found = false;
     while(left <= right) {
         mid = left + (right - left) / 2;
@@ -184,5 +183,5 @@ bool getBookByISBN(int isbn, fstream &indexFile) {
     else {
         cout << "Book is NOT found!" << endl;
     }
-    return found;
+    return offset;
 }
