@@ -9,15 +9,15 @@ using namespace std;
 
 
 struct Author {
-    char authorID[16];
-    char authorName[31];
-    char address[31];
+    char authorID[15];
+    char authorName[30];
+    char address[30];
 };
 
 struct Book {
-    char ISBN[16];
-    char bookTitle[31];
-    char authorID[16];
+    char ISBN[15];
+    char bookTitle[30];
+    char authorID[15];
 };
 
 void addAuthor(const Author& author);
