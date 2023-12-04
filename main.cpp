@@ -34,7 +34,7 @@ void addBook(Book book);
 
 //////////////////////////////
 void deleteBookPrimary(char id[]);
-
+void deleteAuthorPrimary(char id[]);
 
 
 
@@ -342,19 +342,47 @@ void deleteBookPrimary(char id[]){
 
     // Delete from PrimaryIndexBook.txt
     vector<pair<int, int>> data;
-    ifstream file("PrimaryIndexBook.txt");
+    ifstream readPrimary("PrimaryIndexBook.txt");
     int ID, of;
 
-    while (file >> ID >> of) {
+    while (readPrimary >> ID >> of) {
         if (ID != x)
             data.push_back(make_pair(ID, of));
     }
-    file.close();
+    readPrimary.close();
 
-    ofstream file1("PrimaryIndexBook.txt", ios::trunc);
+    ofstream writePrimary("PrimaryIndexBook.txt", ios::trunc);
 
     for (int i = 0; i < data.size(); ++i) {
-        file1 << data[i].first << ' ' << data[i].second << '\n';
+        writePrimary << data[i].first << ' ' << data[i].second << '\n';
     }
-    file1.close();
+    writePrimary.close();
+}
+
+
+void deleteAuthorPrimary(char id[]){
+    ifstream primary("PrimaryIndexAuthor.txt");
+    int x = stoi(id);
+    if(!doesIDExist(primary , x)){
+        cout << "ID doesn't exsit!";
+        return;
+    }
+
+    primary.close();
+
+    vector<pair<int , int>> data;
+    ifstream readPrimary("PrimaryIndexAuthor.txt");
+    int ID , of;
+    while(readPrimary >> ID >> of){
+        if (ID != x)
+            data.push_back(make_pair(ID, of));
+    }
+    readPrimary.close();
+
+
+    ofstream writePrimary("PrimaryIndexAuthor.txt");
+    for(int i = 0 ; i < data.size(); i++){
+        writePrimary << data[i].first << ' ' << data[i].second << '\n';
+    }
+    writePrimary.close();
 }
