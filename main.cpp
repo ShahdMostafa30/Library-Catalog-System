@@ -32,6 +32,9 @@ void insertAuthorID(char authorID[], char ISBN[]);
 void addAuthor(Author author);
 void addBook(Book book);
 
+//////////////////////////////
+void deleteBookPrimary(char id[]);
+
 
 
 
@@ -324,4 +327,34 @@ void insertAuthorID(char authorID[], char ISBN[]) {
 
 void addAuthor(Author author){
 
+}
+
+void deleteBookPrimary(char id[]){
+    ifstream primary("PrimaryIndexBook.txt");
+    int x = atoi(id);
+
+    if (!doesIDExist(primary, x)) {
+        cout << "ID doesn't exist!" << endl;
+        return;
+    }
+
+    primary.close();
+
+    // Delete from PrimaryIndexBook.txt
+    vector<pair<int, int>> data;
+    ifstream file("PrimaryIndexBook.txt");
+    int ID, of;
+
+    while (file >> ID >> of) {
+        if (ID != x)
+            data.push_back(make_pair(ID, of));
+    }
+    file.close();
+
+    ofstream file1("PrimaryIndexBook.txt", ios::trunc);
+
+    for (int i = 0; i < data.size(); ++i) {
+        file1 << data[i].first << ' ' << data[i].second << '\n';
+    }
+    file1.close();
 }
