@@ -1,5 +1,6 @@
+
 #include<bits/stdc++.h>
-#include <fstream>
+
 using namespace std;
 
 //Files:
@@ -9,179 +10,318 @@ using namespace std;
 //For Linked List -> LLAuthor ->(#, ID(for author), Pointer)
 //                -> LLBook   ->(#, ID(for book), Pointer)
 
-long long getAuthorByID(int id, fstream &indexFile); // search for the author by id and print the author record
-long long getBookByISBN(int isbn, fstream &indexFile); // search for the book by isbn and print the book record
+struct Author {
+    char authorID[15];
+    char authorName[30];
+    char address[30];
+};
+
+struct Book {
+    char ISBN[15];
+    char bookTitle[30];
+    char authorID[30];
+};
+
+
+// Function declarations
+bool doesIDExist(ifstream& primary, int x);
+void insertAuthorPrimary(char id[], short offset);
+void insertBookPrimary(char id[], short offset);
+void insertAuthorName(char name[], char ID[]);
+void insertAuthorID(char authorID[], char ISBN[]);
+void addAuthor(Author author);
+void addBook(Book book);
+
+
 
 
 int main() {
-    fstream primary("PrimaryIndexAuthor.txt", ios::in);
-    int n; cin >> n;
-    cout << getAuthorByID(n, primary);
-    primary.close();
+    
+
     return 0;
 }
-// A function that takes the authorID as a parameter and binary search for the authorID in the PrimaryIndexAuthor file
-// and get the offset of the author record then seek to the offset in the Author file and read the author record
-long long getAuthorByID(int id, fstream &indexFile) {
-        // open the PrimaryIndexAuthor file in the read mode
-        // count the number of records in the PrimaryIndexAuthor file
-        int count = 0;
-        string line;
-        while (getline(indexFile, line))
-        {
-            count++;
-        }
-        // loop through the PrimaryIndexAuthor file
-        // and get each id and compare it with the id parameter
-        indexFile.clear();
-        indexFile.seekg(0, ios::beg);
-        // store records into a map to sort them
-        vector<pair<int, int>> records;
-        for(int i = 0; i < count; i++) {
-            if(getline(indexFile, line)) {
-                int currentID, currentOffset;
-                // before the space is the id
-                // after the space is the offset
-                currentID = stoi(line.substr(0, line.find(' ')));
-                currentOffset = stoi(line.substr(line.find(' ') + 1));
-                // insert the record into the map
-                records.emplace_back(currentID, currentOffset);
-            }
-        }
-        indexFile.close();
+/**
+ * Checks if a given ID already exists in the provided primary index file.
+ *
+ * @param primary The ifstream of the primary index file
+ * @param x The ID to check for existence
+ * @return true if the ID already exists, false otherwise
+ */
+bool doesIDExist(ifstream& primary, int x) {
+    int tmp = 0;
+    short of = 0;
 
-        // binary search for the id
-        int left = 0, right = count-1, mid;
-        int offset = -1;
-        bool found = false;
-        while(left <= right) {
-            mid = left + (right - left) / 2;
-            if(records[mid].first == id) {
-                found = true;
-                offset = records[mid].second;
-                break;
+    primary.seekg(0, ios::beg);
+
+    while (primary >> tmp >> of) {
+        if (tmp == x) {
+            return true; // ID already exists
+        }
+    }
+
+    return false; // ID does not exist
+}
+/**
+ * Inserts a new record into the primary index file for authors.
+ *
+ * @param id The ID of the author to be inserted
+ * @param offset The offset of the author record
+ */
+void insertAuthorPrimary(char id[], short offset) {
+    ifstream primary("PrimaryIndexAuthor.txt");
+    int x = atoi(id);
+
+    if (doesIDExist(primary, x)) {
+        cout << "ID already exists!" << endl;
+        return;
+    }
+
+    primary.close();
+
+    // Read all records
+    vector<pair<int, short>> records;
+
+    ifstream readPrimary("PrimaryIndexAuthor.txt");
+    int tmp;
+    short of;
+
+    while (readPrimary >> tmp >> of) {
+        records.push_back(make_pair(tmp, of));
+    }
+
+    readPrimary.close();
+
+    // Insert the new record into the correct position
+    auto it = records.begin();
+    while (it != records.end() && it->first < x) {
+        ++it;
+    }
+
+    records.insert(it, make_pair(x, offset));
+
+    // Rewrite all records into the file in sorted order
+    ofstream writePrimary("PrimaryIndexAuthor.txt", ios::trunc);
+
+    for (const auto& record : records) {
+        writePrimary << record.first << ' ' << record.second << '\n';
+    }
+
+    writePrimary.close();
+}
+/**
+ * Inserts a new record into the primary index file for books.
+ *
+ * @param id The ID of the book to be inserted
+ * @param offset The offset of the book record
+ */
+void insertBookPrimary(char id[], short offset){
+    ifstream primary("PrimaryIndexBook.txt");
+    int x = atoi(id);
+
+    if (doesIDExist(primary, x)) {
+        cout << "ID already exists!" << endl;
+        return;
+    }
+
+    primary.close();
+
+    // Read all records
+    vector<pair<int, short>> records;
+
+    ifstream readPrimary("PrimaryIndexBook.txt");
+    int tmp;
+    short of;
+
+    while (readPrimary >> tmp >> of) {
+        records.push_back(make_pair(tmp, of));
+    }
+
+    readPrimary.close();
+
+    // Insert the new record into the correct position
+    auto it = records.begin();
+    while (it != records.end() && it->first < x) {
+        ++it;
+    }
+
+    records.insert(it, make_pair(x, offset));
+
+    // Rewrite all records into the file in sorted order
+    ofstream writePrimary("PrimaryIndexBook.txt", ios::trunc);
+
+    for (const auto& record : records) {
+        writePrimary << record.first << ' ' << record.second << '\n';
+    }
+
+    writePrimary.close();
+}
+/**
+ * Inserts a new record into the linked list and secondary index files for authors.
+ *
+ * @param name The name of the author to be inserted
+ * @param ID The ID of the author
+ */
+
+void insertAuthorName(char name[], char ID[]) {
+    vector<pair<string, string>> data;
+    ifstream file("SecondaryIndexAuthor.txt", ios::ate);
+
+    // Check if the file is empty
+    if (file.tellg() == 0) {
+        // If file is empty, create and write initial records
+        ofstream secFile("SecondaryIndexAuthor.txt");
+        secFile << name << ' ' << 0 << '\n';
+        secFile.close();
+
+        ofstream llFile("LLAuthor.txt");
+        llFile << 0 << ' ' << ID << ' ' << -1 << '\n';
+        llFile.close();
+    } else {
+        // File not empty, read and process records
+        ifstream secFile("SecondaryIndexAuthor.txt");
+        ifstream llFile("LLAuthor.txt");
+        string n, id;
+        int secPointer, llPointer, x;
+
+        // Loop through records in SecondaryIndexAuthor.txt
+        while (secFile >> n >> secPointer) {
+            llFile.clear();
+            llFile.seekg(0, ios::beg);
+
+            // Match found in SecondaryIndexAuthor.txt
+            while (llFile >> llPointer >> id >> x) {
+                if (secPointer == llPointer) {
+                    data.push_back(make_pair(n, id));
+
+                    // If x is not -1, continue pushing IDs until x is -1
+                    while (x != -1) {
+                        llFile >> llPointer >> id >> x;
+                        data.push_back(make_pair(n, id));
+                    }
+
+                    break; // Stop after processing IDs with x = -1
+                }
             }
-            else if (records[mid].first < id)
-            {
-                left = mid + 1;
-            }
+        }
+
+        secFile.close();
+        llFile.close();
+
+        // Add the new name and ID
+        data.push_back(make_pair(name, ID));
+
+        // Define a lambda comparator to sort based on pair.first
+        auto compareFirst = [](const auto& a, const auto& b) {
+            return a.first < b.first;
+        };
+        // Sort the vector based on pair.first
+        sort(data.begin(), data.end(), compareFirst);
+
+        // Write sorted data back to files
+        ofstream secFile1("SecondaryIndexAuthor.txt", ios::trunc);
+        ofstream llFile1("LLAuthor.txt", ios::trunc);
+
+        // Write to SecondaryIndexAuthor.txt and LLAuthor.txt
+        for (int i = 0; i < data.size(); ++i) {
+            if (i == 0 || data[i].first != data[i - 1].first)
+                secFile1 << data[i].first << ' ' << i << '\n';
+
+            if (data[i].first == data[i + 1].first)
+                llFile1 << i << ' ' << data[i].second << ' ' << i + 1 << '\n';
             else
-            {
-                right = mid - 1;
+                llFile1 << i << ' ' << data[i].second << ' ' << -1 << '\n';
+        }
+
+        // Display the sorted data
+        for (int i = 0; i < data.size(); ++i) {
+            cout << data[i].first << ' ' << data[i].second << '\n';
+        }
+    }
+}
+/**
+ * Inserts a new record into the linked list and secondary index files for books.
+ *
+ * @param authorID The ID of the author to be inserted
+ * @param ISBN The ISBN of the book associated with the author
+ */
+
+void insertAuthorID(char authorID[], char ISBN[]) {
+    vector<pair<string, string>> data;
+    ifstream file("SecondaryIndexBook.txt", ios::ate);
+
+    // Check if the file is empty
+    if (file.tellg() == 0) {
+        // If file is empty, create and write initial records
+        ofstream secFile("SecondaryIndexBook.txt");
+        secFile << authorID << ' ' << 0 << '\n';
+        secFile.close();
+
+        ofstream llFile("LLBook.txt");
+        llFile << 0 << ' ' << ISBN << ' ' << -1 << '\n';
+        llFile.close();
+    } else {
+        // File not empty, read and process records
+        ifstream secFile("SecondaryIndexBook.txt");
+        ifstream llFile("LLBook.txt");
+        string autID, isbn;
+        int secPointer, llPointer, x;
+
+        // Loop through records in SecondaryIndexAuthor.txt
+        while (secFile >> autID >> secPointer) {
+            llFile.clear();
+            llFile.seekg(0, ios::beg);
+
+            // Match found in SecondaryIndexAuthor.txt
+            while (llFile >> llPointer >> isbn >> x) {
+                if (secPointer == llPointer) {
+                    data.push_back(make_pair(autID, isbn));
+
+                    // If x is not -1, continue pushing IDs until x is -1
+                    while (x != -1) {
+                        llFile >> llPointer >> isbn >> x;
+                        data.push_back(make_pair(autID, isbn));
+                    }
+
+                    break; // Stop after processing IDs with x = -1
+                }
             }
         }
-        if(found) {
-            cout << "Author is found!" << endl;
-            // open the Author file in the read mode
-            ifstream author("Author.txt", ios:: binary);
-            // seek to the offset
-            author.seekg(offset, ios::beg);
-            // read the length of the author record
-            char length[3];
-            length[2] = '\0';
-            author.read(length, 2);
-            // convert the length to integer
-            int len = stoi(length);
-            // read about len bytes from the current position
-            char* record = new char[len+1];
-            record[len] = '\0';
-            author.read(record, len);
-            author.close();
-            // parse the record
-            stringstream ss(record);
-            string ID, name, address;
-            getline(ss, ID, '|');
-            getline(ss, name, '|');
-            getline(ss, address, '|');
-            cout << "ID: " << ID << "\nName: "<< name << "\nAddress: " << address << endl;
+
+        secFile.close();
+        llFile.close();
+
+        // Add the new name and ID
+        data.push_back(make_pair(authorID, ISBN));
+
+        // Define a lambda comparator to sort based on pair.first
+        auto compareFirst = [](const auto& a, const auto& b) {
+            return a.first < b.first;
+        };
+        // Sort the vector based on pair.first
+        sort(data.begin(), data.end(), compareFirst);
+
+        // Write sorted data back to files
+        ofstream secFile1("SecondaryIndexBook.txt", ios::trunc);
+        ofstream llFile1("LLBook.txt", ios::trunc);
+
+        // Write to SecondaryIndexBook.txt and LLBook.txt
+        for (int i = 0; i < data.size(); ++i) {
+            if (i == 0 || data[i].first != data[i - 1].first)
+                secFile1 << data[i].first << ' ' << i << '\n';
+
+            if (data[i].first == data[i + 1].first)
+                llFile1 << i << ' ' << data[i].second << ' ' << i + 1 << '\n';
+            else
+                llFile1 << i << ' ' << data[i].second << ' ' << -1 << '\n';
         }
-        else {
-            cout << "Author is NOT found!" << endl;
+
+        // Display the sorted data
+        for (int i = 0; i < data.size(); ++i) {
+            cout << data[i].first << ' ' << data[i].second << '\n';
         }
-    return offset;
+    }
 }
 
-// A function that takes the ISBN as a parameter and binary search for the ISBN in the PrimaryIndexBook file
-long long getBookByISBN(int isbn, fstream &indexFile) {
-    // count the number of records in the PrimaryIndexBook file
-    int count = 0;
-    string line;
-    while (getline(indexFile, line))
-    {
-        count++;
-    }
-    // loop through the PrimaryIndexAuthor file
-    // and get each id and compare it with the id parameter
-    indexFile.clear();
-    indexFile.seekg(0, ios::beg);
-    // store records into a map to sort them
-    vector<pair<int, int>> records;
-    for(int i = 0; i < count; i++) {
-        if (getline(indexFile, line)) {
-            int currentISBN, currentOffset;
-            string temp = line.substr(0, line.find(' '));
-            string temp2 = line.substr(line.find(' ') + 1);
+void addAuthor(Author author){
 
-            try {
-                currentISBN = stoi(temp);
-                currentOffset = stoi(temp2);
-                records.emplace_back(currentISBN, currentOffset);
-            } catch (const std::exception& e) {
-                cerr << "Error converting line " << i + 1 << ": " << e.what() << endl;
-                // Handle or skip this line as needed
-                continue; // Skip to the next iteration
-            }
-        }
-    }
-    indexFile.close();
-
-    // binary search for the id
-    int left = 0, right = count-1, mid;
-    int offset = -1;
-    bool found = false;
-    while(left <= right) {
-        mid = left + (right - left) / 2;
-        if(records[mid].first == isbn) {
-            found = true;
-            offset = records[mid].second;
-            break;
-        }
-        else if (records[mid].first < isbn)
-        {
-            left = mid + 1;
-        }
-        else
-        {
-            right = mid - 1;
-        }
-    }
-    if(found) {
-        cout << "Book is found!" << endl;
-        // open the Author file in the read mode
-        ifstream book("Book.txt", ios:: binary);
-        // seek to the offset
-        book.seekg(offset, ios::beg);
-        // read the length of the author record
-        char length[3];
-        length[2] = '\0';
-        book.read(length, 2);
-        // convert the length to integer
-        int len = stoi(length);
-        // read about len bytes from the current position
-        char* record = new char[len+1];
-        record[len] = '\0';
-        book.read(record, len);
-        book.close();
-        // parse the record
-        stringstream ss(record);
-        string ISBN, title, authorID;
-        getline(ss, ISBN, '|');
-        getline(ss, title, '|');
-        getline(ss, authorID, '|');
-        cout << "ID: " << ISBN << "\nName: " << title << "\nAddress: " << authorID << endl;
-    }
-    else {
-        cout << "Book is NOT found!" << endl;
-    }
-    return offset;
 }
