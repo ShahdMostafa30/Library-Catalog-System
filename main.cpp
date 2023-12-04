@@ -27,18 +27,16 @@ struct Book {
 bool doesIDExist(ifstream& primary, int x);
 void insertAuthorPrimary(char id[], short offset);
 void insertBookPrimary(char id[], short offset);
-vector<Author> loadAuthorData();
-bool compareByName(const Author& a, const Author& b);
-void insertAuthorNameSecondary();
-vector<Book> loadBookData();
-bool compareByAuthorID(const Book& a, const Book& b);
-void insertAuthorIDSecondary();
+void insertAuthorName(char name[], char ID[]);
+void insertAuthorID(char authorID[], char ISBN[]);
+void addAuthor(Author author);
+void addBook(Book book);
 
 
 
 
 int main() {
-//  insertAuthorID();
+    
 
     return 0;
 }
@@ -157,176 +155,173 @@ void insertBookPrimary(char id[], short offset){
 
     writePrimary.close();
 }
-
 /**
- * Loads author data from a file.
- * Reads three fields for each Author: ID, Name, Address
- * Returns a vector of Author structs.
- */
-vector<Author> loadAuthorData() {
-    vector<Author> authors;
-
-    ifstream file("Author.txt");
-
-    string line;
-
-    getline(file, line); // Read the entire line
-
-    istringstream ss(line);
-    string field;
-
-    while (getline(ss, field, '|')) {
-        Author author;
-
-        // Read three fields for an Author
-        strcpy(author.authorID, field.c_str());
-        getline(ss, field, '|');
-        strcpy(author.authorName, field.c_str());
-        getline(ss, field, '|');
-        strcpy(author.address, field.c_str());
-
-        // Remove first two characters
-        string idString = author.authorID;
-        idString = idString.substr(2);
-        strcpy(author.authorID, idString.c_str());
-
-        // Add the Author to the vector
-        authors.push_back(author);
-    }
-
-    file.close();
-    return authors;
-}
-/**
- * Comparison function to sort Authors by name.
+ * Inserts a new record into the linked list and secondary index files for authors.
  *
- * @param a The first Author struct to compare
- * @param b The second Author struct to compare
- * @return True if a's name is lexicographically less than b's name, false otherwise
+ * @param name The name of the author to be inserted
+ * @param ID The ID of the author
  */
-bool compareByName(const Author& a, const Author& b) {
-    return strcmp(a.authorName, b.authorName) < 0;
-}
-/**
- * Loads data from file and sorts it by name.
- * Writes sorted data to LLAuthor.txt and SecondaryIndexAuthor.txt.
- */
-void insertAuthorNameSecondary() {
 
-    //load data from file and sort this by name
-    vector<Author> data = loadAuthorData();
+void insertAuthorName(char name[], char ID[]) {
+    vector<pair<string, string>> data;
+    ifstream file("SecondaryIndexAuthor.txt", ios::ate);
 
-    sort(data.begin(), data.end(), compareByName);
+    // Check if the file is empty
+    if (file.tellg() == 0) {
+        // If file is empty, create and write initial records
+        ofstream secFile("SecondaryIndexAuthor.txt");
+        secFile << name << ' ' << 0 << '\n';
+        secFile.close();
 
+        ofstream llFile("LLAuthor.txt");
+        llFile << 0 << ' ' << ID << ' ' << -1 << '\n';
+        llFile.close();
+    } else {
+        // File not empty, read and process records
+        ifstream secFile("SecondaryIndexAuthor.txt");
+        ifstream llFile("LLAuthor.txt");
+        string n, id;
+        int secPointer, llPointer, x;
 
-    ofstream llFile("LLAuthor.txt",ios::trunc);
-    for (int i = 0; i < data.size(); ++i) {
+        // Loop through records in SecondaryIndexAuthor.txt
+        while (secFile >> n >> secPointer) {
+            llFile.clear();
+            llFile.seekg(0, ios::beg);
 
-        llFile << i <<' '<< data[i].authorID;
+            // Match found in SecondaryIndexAuthor.txt
+            while (llFile >> llPointer >> id >> x) {
+                if (secPointer == llPointer) {
+                    data.push_back(make_pair(n, id));
 
-        // Check if next author has the same name
-        if (i + 1 < data.size() && strcmp(data[i + 1].authorName , data[i].authorName)==0) {
-            llFile << ' ' << i + 1 << '\n';
-        } else {
-            llFile << ' ' << -1 << '\n';
+                    // If x is not -1, continue pushing IDs until x is -1
+                    while (x != -1) {
+                        llFile >> llPointer >> id >> x;
+                        data.push_back(make_pair(n, id));
+                    }
+
+                    break; // Stop after processing IDs with x = -1
+                }
+            }
+        }
+
+        secFile.close();
+        llFile.close();
+
+        // Add the new name and ID
+        data.push_back(make_pair(name, ID));
+
+        // Define a lambda comparator to sort based on pair.first
+        auto compareFirst = [](const auto& a, const auto& b) {
+            return a.first < b.first;
+        };
+        // Sort the vector based on pair.first
+        sort(data.begin(), data.end(), compareFirst);
+
+        // Write sorted data back to files
+        ofstream secFile1("SecondaryIndexAuthor.txt", ios::trunc);
+        ofstream llFile1("LLAuthor.txt", ios::trunc);
+
+        // Write to SecondaryIndexAuthor.txt and LLAuthor.txt
+        for (int i = 0; i < data.size(); ++i) {
+            if (i == 0 || data[i].first != data[i - 1].first)
+                secFile1 << data[i].first << ' ' << i << '\n';
+
+            if (data[i].first == data[i + 1].first)
+                llFile1 << i << ' ' << data[i].second << ' ' << i + 1 << '\n';
+            else
+                llFile1 << i << ' ' << data[i].second << ' ' << -1 << '\n';
+        }
+
+        // Display the sorted data
+        for (int i = 0; i < data.size(); ++i) {
+            cout << data[i].first << ' ' << data[i].second << '\n';
         }
     }
-
-    llFile.close();
-
-    ofstream secFile("SecondaryIndexAuthor.txt");
-
-    secFile << data[0].authorName << ' ' << 0 << '\n';
-
-    for (int i = 1; i < data.size(); ++i) {
-        if(strcmp(data[i].authorName,data[i-1].authorName) == 0)
-            continue;
-        else
-            secFile  << data[i].authorName <<' '<< i << '\n';
-    }
-
 }
 /**
- * Loads book data from a file.
- * Reads three fields for each Book: ISBN, BookTitle, AuthorID
- * Returns a vector of Book structs.
- */
-vector<Book> loadBookData() {
-    vector<Book> authors;
-    ifstream file("Book.txt");
-    string line;
-
-    getline(file, line); // Read the entire line
-
-    istringstream ss(line);
-    string field;
-
-    while (getline(ss, field, '|')) {
-         Book book;
-
-        // Read three fields for a Book
-        strcpy(book.ISBN, field.c_str());
-        getline(ss, field, '|');
-        strcpy(book.bookTitle, field.c_str());
-        getline(ss, field, '|');
-        strcpy(book.authorID, field.c_str());
-
-        // Remove first two characters
-        string idString = book.ISBN;
-        idString = idString.substr(2);
-        strcpy(book.ISBN, idString.c_str());
-
-        authors.push_back(book);
-    }
-    file.close();
-    return authors;
-}
-/**
- * Comparison function to sort Books by author ID.
+ * Inserts a new record into the linked list and secondary index files for books.
  *
- * @param a The first Book struct to compare
- * @param b The second Book struct to compare
- * @return True if a's author ID is lexicographically less than b's author ID, false otherwise
+ * @param authorID The ID of the author to be inserted
+ * @param ISBN The ISBN of the book associated with the author
  */
-bool compareByAuthorID(const Book& a, const Book& b) {
-    return strcmp(a.authorID, b.authorID) < 0;
-}
-/**
- * Loads data from file and sorts it by author ID.
- * Writes sorted data to LLBook.txt and SecondaryIndexBook.txt.
- */
-void insertAuthorIDSecondary() {
 
-    //load data from file and sort this by authorID
-    vector<Book> data = loadBookData();
+void insertAuthorID(char authorID[], char ISBN[]) {
+    vector<pair<string, string>> data;
+    ifstream file("SecondaryIndexBook.txt", ios::ate);
 
-    sort(data.begin(),data.end(), compareByAuthorID);
+    // Check if the file is empty
+    if (file.tellg() == 0) {
+        // If file is empty, create and write initial records
+        ofstream secFile("SecondaryIndexBook.txt");
+        secFile << authorID << ' ' << 0 << '\n';
+        secFile.close();
 
+        ofstream llFile("LLBook.txt");
+        llFile << 0 << ' ' << ISBN << ' ' << -1 << '\n';
+        llFile.close();
+    } else {
+        // File not empty, read and process records
+        ifstream secFile("SecondaryIndexBook.txt");
+        ifstream llFile("LLBook.txt");
+        string autID, isbn;
+        int secPointer, llPointer, x;
 
-    ofstream llFile("LLBook.txt",ios::trunc);
-    for (int i = 0; i < data.size(); ++i) {
+        // Loop through records in SecondaryIndexAuthor.txt
+        while (secFile >> autID >> secPointer) {
+            llFile.clear();
+            llFile.seekg(0, ios::beg);
 
-        llFile << i <<' '<< data[i].ISBN;
+            // Match found in SecondaryIndexAuthor.txt
+            while (llFile >> llPointer >> isbn >> x) {
+                if (secPointer == llPointer) {
+                    data.push_back(make_pair(autID, isbn));
 
-        // Check if next book has the same authorID
-        if (i + 1 < data.size() && strcmp(data[i + 1].authorID , data[i].authorID)==0) {
-            llFile << ' ' << i + 1 << '\n';
-        } else {
-            llFile << ' ' << -1 << '\n';
+                    // If x is not -1, continue pushing IDs until x is -1
+                    while (x != -1) {
+                        llFile >> llPointer >> isbn >> x;
+                        data.push_back(make_pair(autID, isbn));
+                    }
+
+                    break; // Stop after processing IDs with x = -1
+                }
+            }
+        }
+
+        secFile.close();
+        llFile.close();
+
+        // Add the new name and ID
+        data.push_back(make_pair(authorID, ISBN));
+
+        // Define a lambda comparator to sort based on pair.first
+        auto compareFirst = [](const auto& a, const auto& b) {
+            return a.first < b.first;
+        };
+        // Sort the vector based on pair.first
+        sort(data.begin(), data.end(), compareFirst);
+
+        // Write sorted data back to files
+        ofstream secFile1("SecondaryIndexBook.txt", ios::trunc);
+        ofstream llFile1("LLBook.txt", ios::trunc);
+
+        // Write to SecondaryIndexBook.txt and LLBook.txt
+        for (int i = 0; i < data.size(); ++i) {
+            if (i == 0 || data[i].first != data[i - 1].first)
+                secFile1 << data[i].first << ' ' << i << '\n';
+
+            if (data[i].first == data[i + 1].first)
+                llFile1 << i << ' ' << data[i].second << ' ' << i + 1 << '\n';
+            else
+                llFile1 << i << ' ' << data[i].second << ' ' << -1 << '\n';
+        }
+
+        // Display the sorted data
+        for (int i = 0; i < data.size(); ++i) {
+            cout << data[i].first << ' ' << data[i].second << '\n';
         }
     }
-
-    llFile.close();
-    ofstream secFile("SecondaryIndexBook.txt");
-    secFile << data[0].authorID << ' ' << 0 <<'\n';
-    for (int i = 1; i < data.size(); ++i) {
-        if(strcmp(data[i].authorID,data[i-1].authorID) == 0)
-            continue;
-        else
-            secFile << data[i].authorID << ' '<< i <<'\n';
-    }
 }
 
-//void addAuthor(){
-//
-//}
+void addAuthor(Author author){
+
+}
