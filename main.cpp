@@ -15,11 +15,13 @@ void printAuthorByID(int offset); // print the author record by offset
 void printBookByISBN(int offset); // print the book record by offset
 vector<int> getBookByAuthorID(int id, fstream &secondaryIndexFile); // search for the books by author id and print the book records
 void printBookByAuthorID(const vector<int>& v); // print the book records
+vector<int> getAuthorByName(string name, fstream &secondaryIndexFile); // search for the authors by name and print the author records
+void printAuthorByName(const vector<int>& v); // print the author records
 
 int main() {
-    fstream secondary("SecondaryIndexBook.txt", ios::in);
-    int n; cin >> n;
-    printBookByAuthorID(getBookByAuthorID(n, secondary));
+    fstream secondary("SecondaryIndexAuthor.txt", ios::in);
+    string name; cin >> name;
+    printAuthorByName(getAuthorByName(name, secondary));
     secondary.close();
     return 0;
 }
@@ -305,5 +307,123 @@ void printBookByAuthorID(const vector<int>& v) {
         int offset = getBookByISBN(v[i], primaryIndexFile);
         printBookByISBN(offset);
         primaryIndexFile.close();
+    }
+}
+vector<int> getAuthorByName(string name, fstream &secondaryIndexFile) {
+    // count the number of records in the secondaryIndexFile
+    int count = 0;
+    string line;
+    while (getline(secondaryIndexFile, line))
+    {
+        count++;
+    }
+    secondaryIndexFile.clear();
+    secondaryIndexFile.seekg(0, ios::beg);
+
+    // store records of the secondary index file into a vector
+    vector<pair<string, int>> records;
+    // convert the hash value to integer
+    for(int i = 0; i < count; i++) {
+        if (getline(secondaryIndexFile, line)) {
+            int hashValue;
+            string Name = line.substr(0, line.find(' '));
+            string temp = line.substr(line.find(' ') + 1);
+            try {
+                hashValue = stoi(temp);
+                records.emplace_back(Name, hashValue);
+            }
+            catch (const std::exception& e) {
+                cerr << "Error converting line " << i + 1 << ": " << e.what() << endl;
+                // Handle or skip this line as needed
+                continue; // Skip to the next iteration
+            }
+        }
+    }
+    // count the number of records in the linked list
+    fstream linkedListFile("LLAuthor.txt", ios::in);
+    int linkedListCount = 0;
+    string line2;
+    while (getline(linkedListFile, line2))
+    {
+        linkedListCount++;
+    }
+
+    linkedListFile.clear();
+    linkedListFile.seekg(0, ios::beg);
+    // store the linked list in a vector of tuples
+    vector<tuple<int, int, int>> linkedList;
+    for(int i = 0; i < linkedListCount; i++) {
+        if (getline(linkedListFile, line2)) {
+            int currentHashValue, currentID, currentPointer;
+            string temp1 = line2.substr(0, line2.find(' '));
+            string temp2 = line2.substr(line2.find(' ') + 1);
+            string temp3 = temp2.substr(temp2.find(' ') + 1);
+            try {
+                currentHashValue = stoi(temp1);
+                currentID = stoi(temp2);
+                currentPointer = stoi(temp3);
+                linkedList.emplace_back(currentHashValue, currentID, currentPointer);
+            } catch (const std::exception& e) {
+                cerr << "Error converting line " << i + 1 << ": " << e.what() << endl;
+                // Handle or skip this line as needed
+                continue; // Skip to the next iteration
+            }
+        }
+    }
+    // 1- binary search for the name to get the hash value
+    int left = 0, right = count-1, mid;
+    int hashValue = -1;
+    while(left <= right) {
+        mid = left + (right - left) / 2;
+        if(records[mid].first == name) {
+            hashValue = records[mid].second;
+            break;
+        }
+        else if (records[mid].first < name)
+        {
+            left = mid + 1;
+        }
+        else
+        {
+            right = mid - 1;
+        }
+    }
+    // if the author is not found return empty vector
+    if(hashValue == -1) {
+        cout << "Author is NOT found!" << endl;
+        return {};
+    }
+    // 2- binary search on the linked list to get all the authors of the same name
+    int pointer = hashValue;
+    vector<int> AuthorIDs;
+    while(pointer != -1) {
+        left = 0, right = linkedListCount-1;
+        while(left <= right) {
+            mid = left + (right - left) / 2;
+            if(get<0>(linkedList[mid]) == pointer) {
+                AuthorIDs.push_back(get<1>(linkedList[mid]));
+                pointer = get<2>(linkedList[mid]);
+                break;
+            }
+            else if (get<0>(linkedList[mid]) < pointer)
+            {
+                left = mid + 1;
+            }
+            else
+            {
+                right = mid - 1;
+            }
+        }
+    }
+    return AuthorIDs;
+}
+void printAuthorByName(const vector<int>& v) {
+    // 3- print all the Author records
+    for(int i = 0; i < v.size(); i++) {
+        fstream primaryIndexFile("PrimaryIndexAuthor.txt", ios::in | ios::binary);
+        int offset = getAuthorByID(v[i], primaryIndexFile);
+        printAuthorByID(offset);
+        primaryIndexFile.close();
+        cout << endl;
     }
 }
