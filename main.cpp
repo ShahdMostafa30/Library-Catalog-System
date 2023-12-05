@@ -1,5 +1,6 @@
 #include<bits/stdc++.h>
 #include <fstream>
+#include <string>
 using namespace std;
 
 //Files:
@@ -9,20 +10,20 @@ using namespace std;
 //For Linked List -> LLAuthor ->(#, ID(for author), Pointer)
 //                -> LLBook   ->(#, ID(for book), Pointer)
 
-int getAuthorByID(int id, fstream &indexFile); // search for the author by id and print the author record
-int getBookByISBN(int isbn, fstream &indexFile); // search for the book by isbn and print the book record
+int getAuthorByID(int id, fstream &indexFile); // search for the author by id
+int getBookByISBN(int isbn, fstream &indexFile); // search for the book by isbn
 void printAuthorByID(int offset); // print the author record by offset
 void printBookByISBN(int offset); // print the book record by offset
 vector<int> getBookByAuthorID(int id, fstream &secondaryIndexFile); // search for the books by author id and print the book records
 void printBookByAuthorID(const vector<int>& v); // print the book records
 vector<int> getAuthorByName(string name, fstream &secondaryIndexFile); // search for the authors by name and print the author records
 void printAuthorByName(const vector<int>& v); // print the author records
+void parseQuery(const string& query); // parse the query and call the appropriate function
 
 int main() {
-    fstream secondary("SecondaryIndexAuthor.txt", ios::in);
-    string name; cin >> name;
-    printAuthorByName(getAuthorByName(name, secondary));
-    secondary.close();
+    string s;
+    getline(cin, s);
+    parseQuery(s);
     return 0;
 }
 // A function that takes the authorID as a parameter and binary search for the authorID in the PrimaryIndexAuthor file
@@ -425,5 +426,50 @@ void printAuthorByName(const vector<int>& v) {
         printAuthorByID(offset);
         primaryIndexFile.close();
         cout << endl;
+    }
+}
+void parseQuery(const string& query) {
+    // Select all from Authors where Author ID= number;
+    if(query.find("Select all from Authors where Author ID=") != string::npos) {
+        string temp = query.substr(query.find('=') + 1);
+        try {
+            int ID = stoi(temp);
+            fstream primaryIndexFile("PrimaryIndexAuthor.txt", ios::in | ios::binary);
+            int offset = getAuthorByID(ID, primaryIndexFile);
+            printAuthorByID(offset);
+            primaryIndexFile.close();
+        }
+        catch (const std::exception& e) {
+            cerr << "Error converting line " << ": " << e.what() << endl;
+            // Handle or skip this line as needed
+        }
+    }
+    // Select all from Books where Author ID= number;
+    else if(query.find("Select all from Books where Author ID=") != string::npos) {
+        string temp = query.substr(query.find('=') + 1);
+        try {
+            int ID = stoi(temp);
+            fstream secondaryIndexFile("SecondaryIndexBook.txt", ios::in | ios::binary);
+            vector<int> ISBNs = getBookByAuthorID(ID, secondaryIndexFile);
+            printBookByAuthorID(ISBNs);
+            secondaryIndexFile.close();
+        }
+        catch (const std::exception& e) {
+            cerr << "Error converting line " << ": " << e.what() << endl;
+            // Handle or skip this line as needed
+        }
+    }
+    // Select Author from Authors where Author Name= name;
+    else if(query.find("Select Author from Authors where Author Name=") != string::npos) {
+        string name = query.substr(query.find('=') + 2);
+        // remove the last ";"
+        name = name.substr(0, name.size() - 1);
+        fstream secondaryIndexFile("SecondaryIndexAuthor.txt", ios::in | ios::binary);
+        vector<int> IDs = getAuthorByName(name, secondaryIndexFile);
+        printAuthorByName(IDs);
+        secondaryIndexFile.close();
+    }
+    else {
+        cout << "Invalid query!" << endl;
     }
 }
