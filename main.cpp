@@ -36,7 +36,18 @@ void addBook(Book book);
 
 
 int main() {
-    
+
+
+    Author author;
+    cout<<"Name: \n";
+    cin>>author.authorName;
+    cout<<"ID: \n";
+    cin>>author.authorID;
+    cout<<"Address: \n";
+    cin>>author.address;
+
+    addAuthor(author);
+
 
     return 0;
 }
@@ -232,10 +243,6 @@ void insertAuthorName(char name[], char ID[]) {
                 llFile1 << i << ' ' << data[i].second << ' ' << -1 << '\n';
         }
 
-        // Display the sorted data
-        for (int i = 0; i < data.size(); ++i) {
-            cout << data[i].first << ' ' << data[i].second << '\n';
-        }
     }
 }
 /**
@@ -315,13 +322,232 @@ void insertAuthorID(char authorID[], char ISBN[]) {
                 llFile1 << i << ' ' << data[i].second << ' ' << -1 << '\n';
         }
 
-        // Display the sorted data
-        for (int i = 0; i < data.size(); ++i) {
-            cout << data[i].first << ' ' << data[i].second << '\n';
+    }
+}
+/**
+ * Function to format a number into a two-byte string.
+ * For example, if number is 1, it will be formatted as "01".
+ *
+ * @param number The number to be formatted.
+ * @return The formatted string representing the number.
+ */
+string formatTwoBytes(int number) {
+    ostringstream oss;
+    oss << setw(2) << setfill('0') << number;
+    return oss.str();
+}
+
+/**
+ * Function to add a new author record to the "Author.txt" file.
+ *
+ * @param author The Author object containing author information.
+ */
+void addAuthor(Author author) {
+
+    // Opening the file in read/write mode
+    fstream file("Author.txt", ios::in | ios::out);
+
+    string header;
+    string line;
+
+    // Reading the first two lines from the file
+    for (int i = 0; i < 2; ++i) {
+        if (i == 0)
+            file >> header; // Reading header
+        else
+            file >> line; // Reading the second line
+    }
+
+    file.close(); // Closing the file after reading
+
+    // Calculating the size of the record to be added
+    int recordSize = strlen(author.authorID) + strlen(author.authorName) + strlen(author.address) + 3;
+    string recSize = formatTwoBytes(recordSize); // Formatting the size as a two-byte string
+
+    // Reopening the file in read/write/binary mode
+    file.open("Author.txt", ios::out | ios::in | ios::binary);
+
+    // Checking if there are no deleted records
+    if (header == "-1") {
+        // No deleted records found, so appending the new record to the end of the file
+        file.seekp(0, ios::end);
+
+        insertAuthorPrimary(author.authorID, file.tellp()); // -> Add to primary index file
+        insertAuthorName(author.authorName, author.authorID); // -> Add to secondary file
+
+        file << recSize << author.authorID << '|' << author.authorName << '|' << author.address << '|';
+        file.close();
+
+    } else {
+        int currentOffset = stoi(header);
+        while (true) {
+            // Loop to search for space in the file to add the new record
+            stringstream data(line);
+            data.seekg(currentOffset + 1); // Skip the '#'
+
+            string prevOffset;
+            char ch;
+            while (data.get(ch) && ch != '|')
+                prevOffset += ch;
+
+            string size;
+            while (data.get(ch) && ch != '|')
+                size += ch;
+
+            // If there is enough space at the current position to insert the new record
+            if (stoi(size) == (recordSize + 2)) {
+                file.seekp(0);
+                file << prevOffset;
+
+                file.seekp(currentOffset + header.length() + 2);
+
+                insertAuthorPrimary(author.authorID, file.tellp()); // -> Add to primary index file
+                insertAuthorName(author.authorName, author.authorID); // -> Add to secondary file
+
+                file << recSize << author.authorID << '|' << author.authorName << '|' << author.address << '|';
+
+                file.close();
+                return;
+            } else if (stoi(size) > (recordSize + 2)) {
+                // If the available space is larger than needed, insert the new record and fill the remaining space with '#'
+                file.seekp(0);
+                file << prevOffset;
+
+                file.seekp(currentOffset + header.length() + 2);
+
+                insertAuthorPrimary(author.authorID, file.tellp()); // -> Add to primary index file
+                insertAuthorName(author.authorName, author.authorID); // -> Add to secondary file
+
+                file << recSize << author.authorID << '|' << author.authorName << '|' << author.address << '|';
+
+                string rest = string(stoi(size) - recordSize - 2, '#');
+                file << rest;
+
+                file.close();
+                return;
+            } else {
+                currentOffset = stoi(prevOffset);
+            }
+            if (stoi(prevOffset) == -1) {
+                // If no suitable space is found, append the new record to the end of the file
+                file.seekp(0, ios::end);
+
+                insertAuthorPrimary(author.authorID, file.tellp()); // -> Add to primary index file
+                insertAuthorName(author.authorName, author.authorID); // -> Add to secondary file
+
+                file << recSize << author.authorID << '|' << author.authorName << '|' << author.address << '|';
+
+                file.close();
+                return;
+            }
         }
     }
 }
 
-void addAuthor(Author author){
+/**
+ * Function to add a new book record to the "Book.txt" file.
+ *
+ * @param author The Book object containing book information.
+ */
+void addBook(Book book) {
 
+    // Opening the file in read/write mode
+    fstream file("Book.txt", ios::in | ios::out);
+
+    string header;
+    string line;
+
+    // Reading the first two lines from the file
+    for (int i = 0; i < 2; ++i) {
+        if (i == 0)
+            file >> header; // Reading header
+        else
+            file >> line; // Reading the second line
+    }
+
+    file.close(); // Closing the file after reading
+
+    // Calculating the size of the record to be added
+    int recordSize = strlen(book.ISBN) + strlen(book.bookTitle) + strlen(book.authorID) + 3;
+    string recSize = formatTwoBytes(recordSize); // Formatting the size as a two-byte string
+
+    // Reopening the file in read/write/binary mode
+    file.open("Book.txt", ios::out | ios::in | ios::binary);
+
+    // Checking if there are no deleted records
+    if (header == "-1") {
+        // No deleted records found, so appending the new record to the end of the file
+        file.seekp(0, ios::end);
+
+        insertBookPrimary(book.ISBN, file.tellp()); // -> Add to primary index file
+        insertAuthorID(book.authorID, book.ISBN); // -> Add to secondary file
+
+        file << recSize << book.ISBN << '|' << book.bookTitle << '|' << book.authorID << '|';
+        file.close();
+
+    } else {
+        int currentOffset = stoi(header);
+        while (true) {
+            // Loop to search for space in the file to add the new record
+            stringstream data(line);
+            data.seekg(currentOffset + 1); // Skip the '#'
+
+            string prevOffset;
+            char ch;
+            while (data.get(ch) && ch != '|')
+                prevOffset += ch;
+
+            string size;
+            while (data.get(ch) && ch != '|')
+                size += ch;
+
+            // If there is enough space at the current position to insert the new record
+            if (stoi(size) == (recordSize + 2)) {
+                file.seekp(0);
+                file << prevOffset;
+
+                file.seekp(currentOffset + header.length() + 2);
+
+                insertBookPrimary(book.ISBN, file.tellp()); // -> Add to primary index file
+                insertAuthorID(book.authorID, book.ISBN); // -> Add to secondary file
+
+                file << recSize << book.ISBN << '|' << book.bookTitle << '|' << book.authorID << '|';
+
+                file.close();
+                return;
+            } else if (stoi(size) > (recordSize + 2)) {
+                // If the available space is larger than needed, insert the new record and fill the remaining space with '#'
+                file.seekp(0);
+                file << prevOffset;
+
+                file.seekp(currentOffset + header.length() + 2);
+
+                insertBookPrimary(book.ISBN, file.tellp()); // -> Add to primary index file
+                insertAuthorID(book.authorID, book.ISBN); // -> Add to secondary file
+
+                file << recSize << book.ISBN << '|' << book.bookTitle << '|' << book.authorID << '|';
+
+                string rest = string(stoi(size) - recordSize - 2, '#');
+                file << rest;
+
+                file.close();
+                return;
+            } else {
+                currentOffset = stoi(prevOffset);
+            }
+            if (stoi(prevOffset) == -1) {
+                // If no suitable space is found, append the new record to the end of the file
+                file.seekp(0, ios::end);
+
+                insertBookPrimary(book.ISBN, file.tellp()); // -> Add to primary index file
+                insertAuthorID(book.authorID, book.ISBN); // -> Add to secondary file
+
+                file << recSize << book.ISBN << '|' << book.bookTitle << '|' << book.authorID << '|';
+
+                file.close();
+                return;
+            }
+        }
+    }
 }
+
