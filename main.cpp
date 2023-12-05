@@ -36,6 +36,7 @@ void addBook(Book book);
 void deleteBookPrimary(char id[]);
 void deleteAuthorPrimary(char id[]);
 void deleteAuthorID(char authorID[]);
+void deleteAuthorName(char name[]);
 void deleteAuthor(Author author);
 void deleteBook(Book book);
 
@@ -60,6 +61,11 @@ int main() {
 //    deleteAuthorID("1");
 //    deleteAuthorID("2");
 //    deleteAuthorID("3");
+
+//    //try deleteAuthorName function
+//    deleteAuthorName("Ahmed");
+//    deleteAuthorName("Ali");
+//    deleteAuthorName("Mohamed");
     return 0;
 }
 /**
@@ -458,4 +464,59 @@ void deleteAuthorID(char authorID[]) {
 //    for (int i = 0; i < data.size(); ++i) {
 //        cout << data[i].first << ' ' << data[i].second << '\n';
 //    }
+}
+
+void deleteAuthorName(char name[]) {
+    vector<pair<string, string>> data;
+
+    ifstream secFile("SecondaryIndexAuthor.txt");
+    ifstream llFile("LLAuthor.txt");
+
+    string ID, isbn;
+    int secPointer, llPointer, x;
+
+    while (secFile >> ID >> secPointer) {
+        llFile.clear();
+        llFile.seekg(0, ios::beg);
+
+        while (llFile >> llPointer >> isbn >> x) {
+            if (secPointer == llPointer && ID != name) {
+                data.push_back(make_pair(ID, isbn));
+
+                while (x != -1) {
+                    llFile >> llPointer >> isbn >> x;
+                    data.push_back(make_pair(ID, isbn));
+                }
+                break;
+            }
+        }
+    }
+
+    secFile.close();
+    llFile.close();
+
+    // Update llFile1 directly using the data vector
+    ofstream llFile1("LLAuthor.txt", ios::trunc);
+
+    for (int i = 0; i < data.size(); ++i) {
+        if (i < data.size() - 1 && data[i].first == data[i + 1].first)
+            llFile1 << i << ' ' << data[i].second << ' ' << i + 1 << '\n';
+        else
+            llFile1 << i << ' ' << data[i].second << ' ' << -1 << '\n';
+    }
+
+    llFile1.close();
+
+    ofstream secFile1("SecondaryIndexAuthor.txt", ios::trunc);
+
+    for (int i = 0; i < data.size(); ++i) {
+        if (i == 0 || data[i].first != data[i - 1].first)
+            secFile1 << data[i].first << ' ' << i << '\n';
+    }
+
+    secFile1.close();
+
+    for (int i = 0; i < data.size(); ++i) {
+        cout << data[i].first << ' ' << data[i].second << '\n';
+    }
 }
