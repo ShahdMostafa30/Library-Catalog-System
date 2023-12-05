@@ -35,12 +35,31 @@ void addBook(Book book);
 //////////////////////////////
 void deleteBookPrimary(char id[]);
 void deleteAuthorPrimary(char id[]);
-
+void deleteAuthorID(char authorID[]);
+void deleteAuthor(Author author);
+void deleteBook(Book book);
 
 
 int main() {
-    
+//    try insertAuthorID function
+//    insertAuthorID("1", "1");
+//    insertAuthorID("1", "2");
+//    insertAuthorID("1", "3");
+//    insertAuthorID("2", "4");
+//    insertAuthorID("2", "5");
+//    insertAuthorID("3", "6");
+//    insertAuthorID("3", "7");
 
+//    //try insertAuthorName function
+//    insertAuthorName("Ahmed", "1");
+//    insertAuthorName("Ali", "2");
+//    insertAuthorName("Ahmed", "3");
+//    insertAuthorName("Mohamed", "4");
+
+// try deleteAuthorID function
+//    deleteAuthorID("1");
+//    deleteAuthorID("2");
+//    deleteAuthorID("3");
     return 0;
 }
 /**
@@ -359,7 +378,6 @@ void deleteBookPrimary(char id[]){
     writePrimary.close();
 }
 
-
 void deleteAuthorPrimary(char id[]){
     ifstream primary("PrimaryIndexAuthor.txt");
     int x = stoi(id);
@@ -385,4 +403,59 @@ void deleteAuthorPrimary(char id[]){
         writePrimary << data[i].first << ' ' << data[i].second << '\n';
     }
     writePrimary.close();
+}
+
+void deleteAuthorID(char authorID[]) {
+    vector<pair<string, string>> data;
+
+    ifstream secFile("SecondaryIndexBook.txt");
+    ifstream llFile("LLBook.txt");
+
+    string ID, isbn;
+    int secPointer, llPointer, x;
+
+    while (secFile >> ID >> secPointer) {
+        llFile.clear();
+        llFile.seekg(0, ios::beg);
+
+        while (llFile >> llPointer >> isbn >> x) {
+            if (secPointer == llPointer && ID != authorID) {
+                data.push_back(make_pair(ID, isbn));
+
+                while (x != -1) {
+                    llFile >> llPointer >> isbn >> x;
+                    data.push_back(make_pair(ID, isbn));
+                }
+                break;
+            }
+        }
+    }
+
+    secFile.close();
+    llFile.close();
+
+    // Update llFile1 directly using the data vector
+    ofstream llFile1("LLBook.txt", ios::trunc);
+
+    for (int i = 0; i < data.size(); ++i) {
+        if (i < data.size() - 1 && data[i].first == data[i + 1].first)
+            llFile1 << i << ' ' << data[i].second << ' ' << i + 1 << '\n';
+        else
+            llFile1 << i << ' ' << data[i].second << ' ' << -1 << '\n';
+    }
+
+    llFile1.close();
+
+    ofstream secFile1("SecondaryIndexBook.txt", ios::trunc);
+
+    for (int i = 0; i < data.size(); ++i) {
+        if (i == 0 || data[i].first != data[i - 1].first)
+            secFile1 << data[i].first << ' ' << i << '\n';
+    }
+
+    secFile1.close();
+
+//    for (int i = 0; i < data.size(); ++i) {
+//        cout << data[i].first << ' ' << data[i].second << '\n';
+//    }
 }
