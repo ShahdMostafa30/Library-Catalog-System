@@ -40,49 +40,29 @@ void deleteBookPrimary(char id[]);
 void deleteAuthorPrimary(char id[]);
 void deleteAuthorID(char authorID[]);
 void deleteAuthorName(char name[]);
-void deleteAuthor(Author author);
-void deleteBook(Book book);
+void deleteAuthor(char authorID[]);
+void deleteBook(char ISBN[]);
 
 
 
 
 
 int main() {
-//    try insertAuthorID function
-//    insertAuthorID("1", "1");
-//    insertAuthorID("1", "2");
-//    insertAuthorID("1", "3");
-//    insertAuthorID("2", "4");
-//    insertAuthorID("2", "5");
-//    insertAuthorID("3", "6");
-//    insertAuthorID("3", "7");
-
-//    //try insertAuthorName function
-//    insertAuthorName("Ahmed", "1");
-//    insertAuthorName("Ali", "2");
-//    insertAuthorName("Ahmed", "3");
-//    insertAuthorName("Mohamed", "4");
-
-    Author author;
-    cout<<"Name: \n";
-    cin>>author.authorName;
-    cout<<"ID: \n";
-    cin>>author.authorID;
-    cout<<"Address: \n";
-    cin>>author.address;
+    Author author = {"1", "Ahmed", "Cairo"};
+    Author author2 = {"2", "Mohamed", "Alex"};
+    Author author3 = {"3", "Ali", "Giza"};
+    Author author4 = {"4", "Mahmoud", "Aswan"};
 
     addAuthor(author);
+    addAuthor(author2);
+    addAuthor(author3);
+    addAuthor(author4);
 
+//    deleteAuthor("1");
+//    deleteAuthor("2");
+//    deleteAuthor("3");
+//    deleteAuthor("4");`
 
-// try deleteAuthorID function
-//    deleteAuthorID("1");
-//    deleteAuthorID("2");
-//    deleteAuthorID("3");
-
-//    //try deleteAuthorName function
-//    deleteAuthorName("Ahmed");
-//    deleteAuthorName("Ali");
-//    deleteAuthorName("Mohamed");
     return 0;
 }
 // A function that takes the authorID as a parameter and binary search for the authorID in the PrimaryIndexAuthor file
@@ -1249,80 +1229,105 @@ void deleteAuthorName(char name[]) {
     }
 }
 
-void deleteAuthor(Author author) {
+void deleteAuthor(char authorID[]) {
     ifstream primary("PrimaryIndexAuthor.txt");
-    int autherID = stoi(author.authorID);
-    if (!doesIDExist(primary, autherID)) {
+    int ID = stoi(authorID);
+    if (!doesIDExist(primary, ID)) {
         cout << "ID doesn't exist!" << endl;
         return;
     }
     primary.close();
 
     // Opening the file in read/write mode
-    fstream Author("Author.txt", ios::in | ios::out);
+    fstream Author("Author.txt", ios::in | ios::out | ios::binary);
+    cout << "Current file position1: " << Author.tellp() << endl;
 
     string header;
-    string line;
+//    string line;
 
-    // Reading the first two lines from the file
+//     Reading the first two lines from the file
     for (int i = 0; i < 2; ++i) {
         if (i == 0)
             Author >> header; // Reading header
-        else
-            Author >> line; // Reading the second line
+//        else
+//            Author >> line; // Reading the second line
     }
 
-    Author.close(); // Closing the file after reading
 
-    // Calculating the size of the record to be deleted
-    int recordSize = strlen(author.authorID) + strlen(author.authorName) + strlen(author.address) + 3;
-    string recSize = formatTwoBytes(recordSize); // Formatting the size as a two-byte string
-
-    deleteAuthorPrimary(author.authorID);
-    deleteAuthorID(author.authorID);
-
-    // open the data file (Author.txt)
-    Author.open("Author.txt", ios::in | ios::out);
-
-    //check if the there are no deleted authors
-    if (header == "-1"){
-        //it is the first deleted author
-        //so we will delete the record and update the header
-
+        // it is the first deleted author
+        // so we will delete the record and update the header
+        // i need to know the offset of the record to be deleted
+        // i need to know the size of the record to be deleted
+        // so the deleted record will be overwritten with #header|size of the deleted record| and the rest of the record will be spaces
+        // then the header will be updated with the offset of the deleted record
         // seek to the record to be deleted
-        Author.seekp(0, ios::beg);
-        // write #-1|size of the deleted record|
-        Author << "#-1|" << recSize << "|";
-        //fill the rest of the record with spaces
-        for (int i = 0; i < recordSize; ++i) {
-            Author << " ";
+
+        cout << "header " << header << endl;
+        cout << "Current file position2: " << Author.tellp() << endl;
+
+        Author.seekp(0, ios::end);
+
+        fstream primary1("PrimaryIndexAuthor.txt");
+        int offset = getAuthorByID(ID , primary1);
+        cout << "offset " << offset << endl;
+        primary1.close();
+
+
+        Author.seekg(offset , ios::beg);
+        char name[30];
+        while(Author.peek() != '|'){
+            Author.seekg(1 , ios::cur);
         }
-        Author.close();
-    } else {
-        // there are deleted authors
-        // we will delete the record and update the header
+        Author.seekg(1 , ios::cur); //to skip the |
+        Author.getline(name , 30 , '|');
+        cout << "name " << name << endl;
+        deleteAuthorName(name);
 
-        // seek to the record to be deleted
-        Author.seekp(0, ios::beg);
+        //know the size of the record to be deleted
+        //it is the two digits before the offset
+        //seek to the offset -2
+        //and store the these two digits in a variable
 
+        Author.seekg(offset , ios::beg);
+        char size[3];
+        Author >> size;
+        size[2] = '\0';
+        int sizeOfRecord;
+        for(int i = 0 ; i < 2 ; i++){
+            sizeOfRecord = sizeOfRecord * 10 + (size[i] - '0');
+        }
+
+        cout << "size of record " << sizeOfRecord << endl;
+
+        //update the record with #header|size of the deleted record|
+        cout << "Current file position3: " << Author.tellp() << endl;
+        Author.seekg(offset , ios::beg);
+        cout << "Current file position4: " << Author.tellp() << endl;
+
+        Author << '#' << header << '|' << sizeOfRecord << '|';
+
+        //152|Mohamed|Alex|
+        //#-1|15|----------
+//        fill the rest of the record with spaces
+        for(int i = 0 ; i < sizeOfRecord - 3 - header.size() ; i++){
+            Author << ' ';
+        }
         //update the header with the offset of this record
-        fstream primary("PrimaryIndexAuthor.txt");
-        int off = getAuthorByID(autherID , primary);
-        header = off;
-        primary.close();
+        header = to_string(offset);
+        cout << "Current file position5: " << Author.tellp() << endl;
 
-        // write #pointer to the next deleted record|size of the deleted record|
-        Author << "#" << header << "|" << recSize << "|";
-        Author.close();
+        Author.seekp(0 , ios::beg);
+        Author << header;
+        cout << "header " << header << endl;
 
-        //fill the rest of the record with spaces
-        for (int i = 0; i < recordSize; ++i) {
-            Author << " ";
-        }
-    }
+
+//        deleteAuthorPrimary(authorID);
+
+    sizeOfRecord = 0;
+    Author.close();
 
 }
 
-void deleteBook(Book book) {
+void deleteBook(char ISBN[]) {
 
 }
