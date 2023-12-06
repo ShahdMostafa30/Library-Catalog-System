@@ -79,15 +79,9 @@ bool doesIDExist(ifstream& primary, int x) {
  * @param offset The offset of the author record
  */
 void insertAuthorPrimary(char id[], short offset) {
-    ifstream primary("PrimaryIndexAuthor.txt");
+
     int x = atoi(id);
 
-    if (doesIDExist(primary, x)) {
-        cout << "ID already exists!" << endl;
-        return;
-    }
-
-    primary.close();
 
     // Read all records
     vector<pair<int, short>> records;
@@ -126,15 +120,9 @@ void insertAuthorPrimary(char id[], short offset) {
  * @param offset The offset of the book record
  */
 void insertBookPrimary(char id[], short offset){
-    ifstream primary("PrimaryIndexBook.txt");
+
     int x = atoi(id);
 
-    if (doesIDExist(primary, x)) {
-        cout << "ID already exists!" << endl;
-        return;
-    }
-
-    primary.close();
 
     // Read all records
     vector<pair<int, short>> records;
@@ -344,6 +332,16 @@ string formatTwoBytes(int number) {
  */
 void addAuthor(Author author) {
 
+    //check if ID already exist
+    ifstream primary("PrimaryIndexAuthor.txt");
+
+    if (doesIDExist(primary, atoi(author.authorID))) {
+        cout << "ID already exists!" << endl;
+        return;
+    }
+
+    primary.close();
+
     // Opening the file in read/write mode
     fstream file("Author.txt", ios::in | ios::out);
 
@@ -380,26 +378,34 @@ void addAuthor(Author author) {
 
     } else {
         int currentOffset = stoi(header);
+        int count = 0;
         while (true) {
+            int offset;
             // Loop to search for space in the file to add the new record
-            stringstream data(line);
-            data.seekg(currentOffset + 1); // Skip the '#'
+            //stringstream data(line);
+            file.seekg(currentOffset + 1); // Skip the '#'
 
             string prevOffset;
             char ch;
-            while (data.get(ch) && ch != '|')
+            while (file.get(ch) && ch != '|')
                 prevOffset += ch;
 
             string size;
-            while (data.get(ch) && ch != '|')
+            while (file.get(ch) && ch != '|')
                 size += ch;
 
             // If there is enough space at the current position to insert the new record
             if (stoi(size) == (recordSize + 2)) {
-                file.seekp(0);
-                file << prevOffset;
 
-                file.seekp(currentOffset + header.length() + 2);
+                if(count == 0){ //if insert in last deleted record
+                    file.seekp(0);
+                    file << prevOffset;
+                }else{
+                    file.seekp(offset + 1);
+                    file << prevOffset;
+                }
+
+                file.seekp(currentOffset);
 
                 insertAuthorPrimary(author.authorID, file.tellp()); // -> Add to primary index file
                 insertAuthorName(author.authorName, author.authorID); // -> Add to secondary file
@@ -409,11 +415,16 @@ void addAuthor(Author author) {
                 file.close();
                 return;
             } else if (stoi(size) > (recordSize + 2)) {
-                // If the available space is larger than needed, insert the new record and fill the remaining space with '#'
-                file.seekp(0);
-                file << prevOffset;
 
-                file.seekp(currentOffset + header.length() + 2);
+                if(count == 0){ //if insert in last deleted record
+                    file.seekp(0);
+                    file << prevOffset;
+                }else{
+                    file.seekp(offset + 1);
+                    file << prevOffset;
+                }
+                // If the available space is larger than needed, insert the new record and fill the remaining space with '#'
+                file.seekp(currentOffset);
 
                 insertAuthorPrimary(author.authorID, file.tellp()); // -> Add to primary index file
                 insertAuthorName(author.authorName, author.authorID); // -> Add to secondary file
@@ -426,7 +437,10 @@ void addAuthor(Author author) {
                 file.close();
                 return;
             } else {
+                offset = currentOffset;
                 currentOffset = stoi(prevOffset);
+
+                count++;
             }
             if (stoi(prevOffset) == -1) {
                 // If no suitable space is found, append the new record to the end of the file
@@ -447,9 +461,19 @@ void addAuthor(Author author) {
 /**
  * Function to add a new book record to the "Book.txt" file.
  *
- * @param author The Book object containing book information.
+ * @param book The Book object containing book information.
  */
 void addBook(Book book) {
+
+    //check if ISBN already exist
+    ifstream primary("PrimaryIndexBook.txt");
+
+    if (doesIDExist(primary, atoi(book.ISBN))) {
+        cout << "ISBN already exists!" << endl;
+        return;
+    }
+
+    primary.close();
 
     // Opening the file in read/write mode
     fstream file("Book.txt", ios::in | ios::out);
@@ -487,26 +511,34 @@ void addBook(Book book) {
 
     } else {
         int currentOffset = stoi(header);
+        int count = 0;
         while (true) {
+            int offset;
             // Loop to search for space in the file to add the new record
-            stringstream data(line);
-            data.seekg(currentOffset + 1); // Skip the '#'
+            //stringstream data(line);
+            file.seekg(currentOffset + 1); // Skip the '#'
 
             string prevOffset;
             char ch;
-            while (data.get(ch) && ch != '|')
+            while (file.get(ch) && ch != '|')
                 prevOffset += ch;
 
             string size;
-            while (data.get(ch) && ch != '|')
+            while (file.get(ch) && ch != '|')
                 size += ch;
 
             // If there is enough space at the current position to insert the new record
             if (stoi(size) == (recordSize + 2)) {
-                file.seekp(0);
-                file << prevOffset;
 
-                file.seekp(currentOffset + header.length() + 2);
+                if(count == 0){ //if insert in last deleted record
+                    file.seekp(0);
+                    file << prevOffset;
+                }else{
+                    file.seekp(offset + 1);
+                    file << prevOffset;
+                }
+
+                file.seekp(currentOffset);
 
                 insertBookPrimary(book.ISBN, file.tellp()); // -> Add to primary index file
                 insertAuthorID(book.authorID, book.ISBN); // -> Add to secondary file
@@ -516,11 +548,16 @@ void addBook(Book book) {
                 file.close();
                 return;
             } else if (stoi(size) > (recordSize + 2)) {
-                // If the available space is larger than needed, insert the new record and fill the remaining space with '#'
-                file.seekp(0);
-                file << prevOffset;
 
-                file.seekp(currentOffset + header.length() + 2);
+                if(count == 0){ //if insert in last deleted record
+                    file.seekp(0);
+                    file << prevOffset;
+                }else{
+                    file.seekp(offset + 1);
+                    file << prevOffset;
+                }
+                // If the available space is larger than needed, insert the new record and fill the remaining space with '#'
+                file.seekp(currentOffset);
 
                 insertBookPrimary(book.ISBN, file.tellp()); // -> Add to primary index file
                 insertAuthorID(book.authorID, book.ISBN); // -> Add to secondary file
@@ -533,7 +570,10 @@ void addBook(Book book) {
                 file.close();
                 return;
             } else {
+                offset = currentOffset;
                 currentOffset = stoi(prevOffset);
+
+                count++;
             }
             if (stoi(prevOffset) == -1) {
                 // If no suitable space is found, append the new record to the end of the file
@@ -550,4 +590,3 @@ void addBook(Book book) {
         }
     }
 }
-
