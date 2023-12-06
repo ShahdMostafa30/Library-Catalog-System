@@ -39,7 +39,7 @@ void addBook(Book book);
 void deleteBookPrimary(char id[]);
 void deleteAuthorPrimary(char id[]);
 void deleteAuthorID(char authorID[]);
-void deleteAuthorName(char name[]);
+void deleteAuthorName(char name[] , char ID[]);
 void deleteAuthor(char authorID[]);
 void deleteBook(char ISBN[]);
 
@@ -48,20 +48,27 @@ void deleteBook(char ISBN[]);
 
 
 int main() {
-    Author author = {"1", "Ahmed", "Cairo"};
-    Author author2 = {"2", "Mohamed", "Alex"};
-    Author author3 = {"3", "Ali", "Giza"};
-    Author author4 = {"4", "Mahmoud", "Aswan"};
 
-    addAuthor(author);
-    addAuthor(author2);
-    addAuthor(author3);
-    addAuthor(author4);
+//    deleteAuthorName("Ahmed" , "2");
+//    remove("Author.txt");
+
+//    Author author = {"1", "Ahmed", "Cairo"};
+//    Author author2 = {"2", "Mohamed", "Alex"};
+//    Author author3 = {"3", "Ali", "Giza"};
+//    Author author4 = {"4", "Mahmoud", "Aswan"};
+//        Author author5 = {"9", "Ali", "III"};
+////
+//    addAuthor(author);
+//    addAuthor(author2);
+//    addAuthor(author3);
+//    addAuthor(author4);
+//    addAuthor(author5);
 
 //    deleteAuthor("1");
-//    deleteAuthor("2");
+    deleteAuthor("2");
 //    deleteAuthor("3");
-//    deleteAuthor("4");`
+//    deleteAuthor("4");
+//    deleteAuthor("9");
 
     return 0;
 }
@@ -814,7 +821,7 @@ void addAuthor(Author author) {
     primary.close();
 
     // Opening the file in read/write mode
-    fstream file("Author.txt", ios::in | ios::out);
+    fstream file("Author2.txt", ios::in | ios::out);
 
     string header;
     string line;
@@ -834,7 +841,7 @@ void addAuthor(Author author) {
     string recSize = formatTwoBytes(recordSize); // Formatting the size as a two-byte string
 
     // Reopening the file in read/write/binary mode
-    file.open("Author.txt", ios::out | ios::in | ios::binary);
+    file.open("Author2.txt", ios::out | ios::in | ios::binary);
 
     // Checking if there are no deleted records
     if (header == "-1") {
@@ -1174,28 +1181,35 @@ void deleteAuthorID(char authorID[]) {
 //    }
 }
 
-void deleteAuthorName(char name[]) {
+void deleteAuthorName(char name[] , char id[]) {
     vector<pair<string, string>> data;
 
     ifstream secFile("SecondaryIndexAuthor.txt");
     ifstream llFile("LLAuthor.txt");
 
-    string ID, isbn;
+    string n, ID;
     int secPointer, llPointer, x;
 
-    while (secFile >> ID >> secPointer) {
+    // Loop through records in SecondaryIndexAuthor.txt
+    while (secFile >> n >> secPointer) {
         llFile.clear();
         llFile.seekg(0, ios::beg);
 
-        while (llFile >> llPointer >> isbn >> x) {
-            if (secPointer == llPointer && ID != name) {
-                data.push_back(make_pair(ID, isbn));
-
-                while (x != -1) {
-                    llFile >> llPointer >> isbn >> x;
-                    data.push_back(make_pair(ID, isbn));
+        // Match found in SecondaryIndexAuthor.txt
+        while (llFile >> llPointer >> ID >> x) {
+            if (secPointer == llPointer) {
+                if(ID != id){
+                    data.push_back(make_pair(n, ID));
                 }
-                break;
+
+                // If x is not -1, continue pushing IDs until x is -1
+                while (x != -1) {
+                    llFile >> llPointer >> ID >> x;
+                    if(ID != id)
+                        data.push_back(make_pair(n, ID));
+                }
+
+                break; // Stop after processing IDs with x = -1
             }
         }
     }
@@ -1239,7 +1253,7 @@ void deleteAuthor(char authorID[]) {
     primary.close();
 
     // Opening the file in read/write mode
-    fstream Author("Author.txt", ios::in | ios::out | ios::binary);
+    fstream Author("Author2.txt", ios::in | ios::out | ios::binary);
     cout << "Current file position1: " << Author.tellp() << endl;
 
     string header;
@@ -1281,7 +1295,7 @@ void deleteAuthor(char authorID[]) {
         Author.seekg(1 , ios::cur); //to skip the |
         Author.getline(name , 30 , '|');
         cout << "name " << name << endl;
-        deleteAuthorName(name);
+        deleteAuthorName(name , authorID);
 
         //know the size of the record to be deleted
         //it is the two digits before the offset
@@ -1321,7 +1335,7 @@ void deleteAuthor(char authorID[]) {
         cout << "header " << header << endl;
 
 
-//        deleteAuthorPrimary(authorID);
+        deleteAuthorPrimary(authorID);
 
     sizeOfRecord = 0;
     Author.close();
