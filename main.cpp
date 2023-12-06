@@ -36,6 +36,15 @@ void addAuthor(Author author);
 void addBook(Book book);
 
 
+void deleteBookPrimary(char id[]);
+void deleteAuthorPrimary(char id[]);
+void deleteAuthorID(char authorID[]);
+void deleteAuthorName(char name[]);
+void deleteAuthor(Author author);
+void deleteBook(Book book);
+
+
+
 
 
 int main() {
@@ -54,15 +63,15 @@ int main() {
 //    insertAuthorName("Ahmed", "3");
 //    insertAuthorName("Mohamed", "4");
 
-//    Author author;
-//    cout<<"Name: \n";
-//    cin>>author.authorName;
-//    cout<<"ID: \n";
-//    cin>>author.authorID;
-//    cout<<"Address: \n";
-//    cin>>author.address;
-//
-//    addAuthor(author);
+    Author author;
+    cout<<"Name: \n";
+    cin>>author.authorName;
+    cout<<"ID: \n";
+    cin>>author.authorID;
+    cout<<"Address: \n";
+    cin>>author.address;
+
+    addAuthor(author);
 
 
 // try deleteAuthorID function
@@ -1027,7 +1036,6 @@ void addBook(Book book) {
     }
 }
 
-
 void deleteBookPrimary(char id[]){
     ifstream primary("PrimaryIndexBook.txt");
     int x = atoi(id);
@@ -1193,4 +1201,82 @@ void deleteAuthorName(char name[]) {
     for (int i = 0; i < data.size(); ++i) {
         cout << data[i].first << ' ' << data[i].second << '\n';
     }
+}
+
+void deleteAuthor(Author author) {
+    ifstream primary("PrimaryIndexAuthor.txt");
+    int autherID = stoi(author.authorID);
+    if (!doesIDExist(primary, autherID)) {
+        cout << "ID doesn't exist!" << endl;
+        return;
+    }
+    primary.close();
+
+    // Opening the file in read/write mode
+    fstream Author("Author.txt", ios::in | ios::out);
+
+    string header;
+    string line;
+
+    // Reading the first two lines from the file
+    for (int i = 0; i < 2; ++i) {
+        if (i == 0)
+            Author >> header; // Reading header
+        else
+            Author >> line; // Reading the second line
+    }
+
+    Author.close(); // Closing the file after reading
+
+    // Calculating the size of the record to be deleted
+    int recordSize = strlen(author.authorID) + strlen(author.authorName) + strlen(author.address) + 3;
+    string recSize = formatTwoBytes(recordSize); // Formatting the size as a two-byte string
+
+    deleteAuthorPrimary(author.authorID);
+    deleteAuthorID(author.authorID);
+
+    // open the data file (Author.txt)
+    Author.open("Author.txt", ios::in | ios::out);
+
+    //check if the there are no deleted authors
+    if (header == "-1"){
+        //it is the first deleted author
+        //so we will delete the record and update the header
+
+        // seek to the record to be deleted
+        Author.seekp(0, ios::beg);
+        // write #-1|size of the deleted record|
+        Author << "#-1|" << recSize << "|";
+        //fill the rest of the record with spaces
+        for (int i = 0; i < recordSize; ++i) {
+            Author << " ";
+        }
+        Author.close();
+    } else {
+        // there are deleted authors
+        // we will delete the record and update the header
+
+        // seek to the record to be deleted
+        Author.seekp(0, ios::beg);
+
+        //update the header with the offset of this record
+        fstream primary("PrimaryIndexAuthor.txt");
+        int off = getAuthorByID(autherID , primary);
+        header = off;
+        primary.close();
+
+        // write #pointer to the next deleted record|size of the deleted record|
+        Author << "#" << header << "|" << recSize << "|";
+        Author.close();
+
+        //fill the rest of the record with spaces
+        for (int i = 0; i < recordSize; ++i) {
+            Author << " ";
+        }
+    }
+
+}
+
+void deleteBook(Book book) {
+
 }
