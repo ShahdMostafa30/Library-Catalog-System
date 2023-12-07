@@ -45,12 +45,21 @@ void deleteBook(char ISBN[]);
 
 
 
+int getAuthorByID(int id, fstream &indexFile); // search for the author by id
+int getBookByISBN(int isbn, fstream &indexFile); // search for the book by isbn
+void printAuthorByID(int offset); // print the author record by offset
+void printBookByISBN(int offset); // print the book record by offset
+vector<int> getBookByAuthorID(int id, fstream &secondaryIndexFile); // search for the books by author id and print the book records
+void printBookByAuthorID(const vector<int>& v); // print the book records
+vector<int> getAuthorByName(string name, fstream &secondaryIndexFile); // search for the authors by name and print the author records
+void printAuthorByName(const vector<int>& v); // print the author records
+void parseQuery(const string& query); // parse the query and call the appropriate function
 
+void updateAuthorNameByID(int id, string newName, fstream &indexFile); // search for the author by id and update the name
+void updateBookTitleByISBN(int isbn, string newTitle, fstream &indexFile); // search for the book by isbn and update the title
 
 int main() {
 
-//    deleteAuthorName("Ahmed" , "2");
-//    remove("Author.txt");
 
 //    Author author = {"1", "Ahmed", "Cairo"};
 //    Author author2 = {"2", "Mohamed", "Alex"};
@@ -1441,4 +1450,238 @@ void deleteBook(char ISBN[]) {
     sizeOfRecord = 0;
     Book.close();
 
+}
+void updateAuthorNameByID(int id, string newName, fstream &indexFile) {
+
+    // search for the author by id and print the author record
+    int offset = getAuthorByID(id, indexFile);
+
+    if (offset != -1) {//author is found
+
+        ifstream author("Author.txt", ios::binary);
+
+        // seek to the offset
+        author.seekg(offset, ios::beg);
+
+        // read the length of the author record
+        char length[3];
+        length[2] = '\0';
+        author.read(length, 2);//read 2 bytes
+
+        // convert the length to integer
+        int len = stoi(length);
+
+        // read about len bytes from the current position
+        char *record = new char[len + 1];
+        record[len] = '\0';//
+        author.read(record, len);
+        author.close();
+
+        // parse the record
+        stringstream ss(record);
+        string ID, name, address;
+        getline(ss, ID, '|');
+        getline(ss, name, '|');
+        getline(ss, address, '|');
+
+        // update code
+        string newRecord = ID + "|" + newName + "|" + address + "|";
+
+        if (newRecord != record) {
+
+            // printing old record
+            cout << "Old Record is: " << endl;
+            cout << record << endl;
+
+            fstream author2("Author.txt", ios::in | ios::out);
+
+            // I work as I use fixed fields
+
+
+            /*  // if she wants to update the author name in secondary file, so I will use add, delete functions
+
+                    Author a;
+                    strcpy(a.authorID, ID.c_str());
+                    strcpy(a.authorName, newName.c_str());
+                    strcpy(a.address, address.c_str());
+
+                    author2.close();
+                    char id[30];
+                    for (int i = 0; i < 30; i++) {
+                        id[i] = a.authorID[i];
+                    }
+                    deleteAuthor(id);
+                    addAuthor(a);
+
+                    cout << "Author name is updated successfully!" << endl;
+                    cout << "New Record is: " << endl;
+                    cout << ID << "|" << newName << "|" << address << "|" << endl;
+            */
+
+
+            if (newName.length() <= 30) {      //new name is valid
+
+                if (name.length() == newName.length()) {    //new name has the same length as the old one
+
+                    author2.seekp(offset + ID.size() + 3, ios::beg);  //seek to the name field
+                    author2 << newName; // update the name
+                    author2.close();
+
+                    cout << "Author name is updated successfully!" << endl;
+                    cout << "New Record is: " << endl;
+                    cout << ID << "|" << newName << "|" << address << "|" << endl;
+
+                } else if (name.length() > newName.length()) { //new name is shorter than the old one
+
+                    author2.seekp(offset + ID.size() + 3, ios::beg); //seek to the name field
+                    author2 << newName;// update the name
+
+                    for (int i = 0; i < name.length() - newName.length(); ++i){ //fill the rest of the field with '-'
+                        author2 << "-";
+                    }
+
+                    author2.close();
+                    cout << "Author name is updated successfully!" << endl;
+                    cout << "New Record is: " << endl;
+                    cout << ID << "|" << newName;
+
+                    //print the rest of the field-> ex: shahd--
+                    for (int i = 0; i < name.length() - newName.length(); ++i) {
+                        cout << "-";
+                    }
+                    cout << "|" << address << "|" << endl;
+
+                } else {     //name.length()<newName.length()
+
+                    cout << "\"We use internal fragmentation with Fixed Fields\": new name is longer than the old one!" << endl;
+                    // cout << "Do you want to continue? (y/n)" << endl;
+                }
+            } else { //new name is too long (not valid)
+
+                cout << "Author name is too long!" << endl;
+                //   cout << "Do you want to continue? (y/n)" << endl;
+            }
+        } else {
+            cout<<"Same record!"<<endl;
+            // cout << "Do you want to continue? (y/n)" << endl;
+        }
+    }else{
+        cout << "Author is NOT found!" << endl;
+        // cout << "Do you want to continue? (y/n)" << endl;
+    }
+}
+
+void updateBookTitleByISBN(int isbn, string newTitle, fstream &indexFile) {
+    // search for the book by isbn and print the book record
+    int offset = getBookByISBN(isbn, indexFile);
+
+    if (offset != -1) {// book is found
+
+        ifstream book("Book.txt", ios::binary);
+
+        // seek to the offset
+        book.seekg(offset, ios::beg);
+
+        // read the length of the book record
+        char length[3];
+        length[2] = '\0';
+        book.read(length, 2);
+
+        // convert the length to integer
+        int len = stoi(length);
+        char *record = new char[len + 1]; // read about len bytes from the current position
+        record[len] = '\0';
+        book.read(record, len);
+        book.close();
+
+        // parse the record
+        stringstream ss(record);
+        string ISBN, title, authorID;
+        getline(ss, ISBN, '|');
+        getline(ss, title, '|');
+        getline(ss, authorID, '|');
+
+
+        // update code
+
+        string newRecord = ISBN + "|" + newTitle + "|" + authorID + "|";
+        if (newRecord != record) {
+
+            // printing old record
+            cout << "Old Record is: " << endl;
+            cout << record << endl;
+
+            fstream book2("Book.txt", ios::in | ios::out);
+
+
+            // I work as I use fixed fields
+
+
+            if (newTitle.length() <= 30) { //new title is valid
+
+                if (title.length() == newTitle.length()) {//new title has the same length as the old one
+
+                    book2.seekp(offset + ISBN.size() + 3, ios::beg);//seek to the title field
+                    book2 << newTitle;
+                    book2.close();
+                    cout << "Book title is updated successfully!" << endl;
+                    cout << ISBN << "|" << newTitle << "|" << authorID << "|" << endl;
+
+                } else if (title.length() > newTitle.length()) {//new title is shorter than the old one
+
+                    book2.seekp(offset + ISBN.size() + 3, ios::beg);//seek to the title field
+                    book2 << newTitle;
+
+                    for (int i = 0; i < title.length() - newTitle.length(); ++i) {//fill the rest of the field with '-'
+                        book2 << "-";
+                    }
+                    book2.close();
+                    cout << "Book title is updated successfully!" << endl;
+                    cout << ISBN << "|" << newTitle;
+
+                    for (int i = 0;
+                         i < title.length() - newTitle.length(); i++)//print the rest of the field-> ex: Book--
+                        cout << "-";
+                    cout << "|" << authorID << "|" << endl;
+
+                } else { //title.length()<newTitle.length()
+
+
+                    /*      // if she wants to update the book title with large size, so I will use add, delete functions
+
+                              Book b;
+                              strcpy(b.ISBN, ISBN.c_str());
+                              strcpy(b.bookTitle, newTitle.c_str());
+                              strcpy(b.authorID, authorID.c_str());
+
+                              book2.close();
+
+                              author2.close();
+                              char isbn[30];
+                              for (int i = 0; i < 30; i++) {
+                                  isbn[i] = b.ISBN[i];
+                              }
+                              deleteAuthor(id);
+                              addAuthor(b);
+
+                              cout << "Book title is updated successfully!" << endl;
+                              cout<<"New Record is: "<<endl;
+                              cout << ISBN << "|" << newTitle << "|" << authorID << "|" << endl;
+                  */
+
+                    cout << "\"We use internal fragmentation with Fixed Fields\": new title is longer than the old one!"
+                         << endl;
+                    //   cout << "Do you want to continue? (y/n)" << endl;
+                }
+            } else { //new title is too long (not valid)
+                cout << "Book title is too long!" << endl;
+                //   cout << "Do you want to continue? (y/n)" << endl;
+            }
+        } else {
+            cout << "Same record!" << endl;
+        }
+    }else{
+        cout<<"Book is NOT found!"<<endl;
+        // cout << "Do you want to continue? (y/n)" << endl;
+    }
 }
