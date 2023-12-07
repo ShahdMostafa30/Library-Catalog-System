@@ -56,13 +56,15 @@ int main() {
 //    Author author2 = {"2", "Mohamed", "Alex"};
 //    Author author3 = {"3", "Ali", "Giza"};
 //    Author author4 = {"4", "Mahmoud", "Aswan"};
-//        Author author5 = {"9", "Ali", "III"};
-////
+//    Author author5 = {"9", "Ali", "III"};
+    Author author = {"1", "ab", "cd"};
+//////
 //    addAuthor(author);
 //    addAuthor(author2);
 //    addAuthor(author3);
 //    addAuthor(author4);
 //    addAuthor(author5);
+    addAuthor(author);
 
 //    deleteAuthor("1");
 //    deleteAuthor("2");
@@ -80,8 +82,8 @@ int main() {
 //    addBook(book3);
 //    addBook(book4);
 
-    deleteBook("2");
-    deleteBook("4");
+//    deleteBook("2");
+//    deleteBook("4");
     return 0;
 }
 // A function that takes the authorID as a parameter and binary search for the authorID in the PrimaryIndexAuthor file
@@ -833,7 +835,7 @@ void addAuthor(Author author) {
     primary.close();
 
     // Opening the file in read/write mode
-    fstream file("Author2.txt", ios::in | ios::out);
+    fstream file("Author.txt", ios::in | ios::out);
 
     string header;
     string line;
@@ -853,7 +855,7 @@ void addAuthor(Author author) {
     string recSize = formatTwoBytes(recordSize); // Formatting the size as a two-byte string
 
     // Reopening the file in read/write/binary mode
-    file.open("Author2.txt", ios::out | ios::in | ios::binary);
+    file.open("Author.txt", ios::out | ios::in | ios::binary);
 
     // Checking if there are no deleted records
     if (header == "-1") {
@@ -885,7 +887,7 @@ void addAuthor(Author author) {
                 size += ch;
 
             // If there is enough space at the current position to insert the new record
-            if (stoi(size) == (recordSize + 2)) {
+            if (stoi(size) == (recordSize)) {
 
                 if(count == 0){ //if insert in last deleted record
                     file.seekp(0);
@@ -904,7 +906,7 @@ void addAuthor(Author author) {
 
                 file.close();
                 return;
-            } else if (stoi(size) > (recordSize + 2)) {
+            } else if (stoi(size) > (recordSize)) {
 
                 if(count == 0){ //if insert in last deleted record
                     file.seekp(0);
@@ -921,7 +923,7 @@ void addAuthor(Author author) {
 
                 file << recSize << author.authorID << '|' << author.authorName << '|' << author.address << '|';
 
-                string rest = string(stoi(size) - recordSize - 2, '#');
+                string rest = string(stoi(size) - recordSize , '#');
                 file << rest;
 
                 file.close();
@@ -1018,7 +1020,7 @@ void addBook(Book book) {
                 size += ch;
 
             // If there is enough space at the current position to insert the new record
-            if (stoi(size) == (recordSize + 2)) {
+            if (stoi(size) == (recordSize )) {
 
                 if(count == 0){ //if insert in last deleted record
                     file.seekp(0);
@@ -1037,7 +1039,7 @@ void addBook(Book book) {
 
                 file.close();
                 return;
-            } else if (stoi(size) > (recordSize + 2)) {
+            } else if (stoi(size) > (recordSize )) {
 
                 if(count == 0){ //if insert in last deleted record
                     file.seekp(0);
@@ -1054,7 +1056,7 @@ void addBook(Book book) {
 
                 file << recSize << book.ISBN << '|' << book.bookTitle << '|' << book.authorID << '|';
 
-                string rest = string(stoi(size) - recordSize - 2, '#');
+                string rest = string(stoi(size) - recordSize , '#');
                 file << rest;
 
                 file.close();
@@ -1265,7 +1267,7 @@ void deleteAuthor(char authorID[]) {
     primary.close();
 
     // Opening the file in read/write mode
-    fstream Author("Author2.txt", ios::in | ios::out | ios::binary);
+    fstream Author("Author.txt", ios::in | ios::out | ios::binary);
 
     string header;
 //    string line;
@@ -1330,6 +1332,12 @@ void deleteAuthor(char authorID[]) {
         for(int i = 0 ; i < sizeOfRecord - 3 - header.size() ; i++){
             Author << ' ';
         }
+
+        Author.seekp(0 , ios::beg);
+        for (int i = 0; i < header.length(); ++i) {
+            Author<<' ';
+        }
+
         //update the header with the offset of this record
         header = to_string(offset);
 
