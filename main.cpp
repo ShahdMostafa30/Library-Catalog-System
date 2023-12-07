@@ -43,7 +43,6 @@ void deleteAuthor(char authorID[]);
 void deleteBook(char ISBN[]);
 
 
-
 int getAuthorByID(int id, fstream &indexFile); // search for the author by id
 int getBookByISBN(int isbn, fstream &indexFile); // search for the book by isbn
 void printAuthorByID(int offset); // print the author record by offset
@@ -1357,9 +1356,6 @@ void deleteAuthorName(char name[] , char id[]) {
 
     secFile1.close();
 
-    for (int i = 0; i < data.size(); ++i) {
-        cout << data[i].first << ' ' << data[i].second << '\n';
-    }
 }
 
 void deleteAuthor(char authorID[]) {
@@ -1673,7 +1669,6 @@ void updateAuthorNameByID(int id, string newName, fstream &indexFile) {
             cout<<"Same record!"<<endl;
         }
     }else{
-        aut
         cout << "Author is NOT found!" << endl;
     }
 }
