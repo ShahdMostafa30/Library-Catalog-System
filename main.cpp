@@ -1266,7 +1266,6 @@ void deleteAuthor(char authorID[]) {
 
     // Opening the file in read/write mode
     fstream Author("Author2.txt", ios::in | ios::out | ios::binary);
-    cout << "Current file position1: " << Author.tellp() << endl;
 
     string header;
 //    string line;
@@ -1288,14 +1287,11 @@ void deleteAuthor(char authorID[]) {
         // then the header will be updated with the offset of the deleted record
         // seek to the record to be deleted
 
-        cout << "header " << header << endl;
-        cout << "Current file position2: " << Author.tellp() << endl;
 
         Author.seekp(0, ios::end);
 
         fstream primary1("PrimaryIndexAuthor.txt");
         int offset = getAuthorByID(ID , primary1);
-        cout << "offset " << offset << endl;
         primary1.close();
 
 
@@ -1306,12 +1302,11 @@ void deleteAuthor(char authorID[]) {
         }
         Author.seekg(1 , ios::cur); //to skip the |
         Author.getline(name , 30 , '|');
-        cout << "name " << name << endl;
         deleteAuthorName(name , authorID);
 
         //know the size of the record to be deleted
         //it is the two digits before the offset
-        //seek to the offset -2
+        //seek to the offset
         //and store the these two digits in a variable
 
         Author.seekg(offset , ios::beg);
@@ -1323,12 +1318,9 @@ void deleteAuthor(char authorID[]) {
             sizeOfRecord = sizeOfRecord * 10 + (size[i] - '0');
         }
 
-        cout << "size of record " << sizeOfRecord << endl;
 
         //update the record with #header|size of the deleted record|
-        cout << "Current file position3: " << Author.tellp() << endl;
         Author.seekg(offset , ios::beg);
-        cout << "Current file position4: " << Author.tellp() << endl;
 
         Author << '#' << header << '|' << sizeOfRecord << '|';
 
@@ -1340,11 +1332,9 @@ void deleteAuthor(char authorID[]) {
         }
         //update the header with the offset of this record
         header = to_string(offset);
-        cout << "Current file position5: " << Author.tellp() << endl;
 
         Author.seekp(0 , ios::beg);
         Author << header;
-        cout << "header " << header << endl;
 
 
         deleteAuthorPrimary(authorID);
@@ -1365,7 +1355,6 @@ void deleteBook(char ISBN[]) {
 
     // Opening the file in read/write mode
     fstream Book("Book.txt", ios::in | ios::out | ios::binary);
-    cout << "Current file position1: " << Book.tellp() << endl;
 
     string header;
 //    string line;
@@ -1387,14 +1376,10 @@ void deleteBook(char ISBN[]) {
     // then the header will be updated with the offset of the deleted record
     // seek to the record to be deleted
 
-    cout << "header " << header << endl;
-    cout << "Current file position2: " << Book.tellp() << endl;
-
     Book.seekp(0, ios::end);
 
     fstream primary1("PrimaryIndexBook.txt");
     int offset = getBookByISBN(isbn , primary1);
-    cout << "offset " << offset << endl;
     primary1.close();
 
 
@@ -1409,7 +1394,6 @@ void deleteBook(char ISBN[]) {
     }
     Book.seekg(1 , ios::cur); //to skip the |
     Book.getline(id , 30 , '|');
-    cout << "id " << id << endl;
     deleteAuthorID(id);
 
     //know the size of the record to be deleted
@@ -1427,12 +1411,9 @@ void deleteBook(char ISBN[]) {
     }
     string formatedSize = formatTwoBytes(sizeOfRecord);
 
-    cout << "size of record " << sizeOfRecord << endl;
 
     //update the record with #header|size of the deleted record|
-    cout << "Current file position3: " << Book.tellp() << endl;
     Book.seekg(offset , ios::beg);
-    cout << "Current file position4: " << Book.tellp() << endl;
 
     Book << '#' << header << '|' << formatedSize << '|';
 
@@ -1443,12 +1424,9 @@ void deleteBook(char ISBN[]) {
     }
     //update the header with the offset of this record
     header = to_string(offset);
-    cout << "Current file position5: " << Book.tellp() << endl;
 
     Book.seekp(0 , ios::beg);
     Book << header;
-    cout << "header " << header << endl;
-
 
     deleteBookPrimary(ISBN);
 
