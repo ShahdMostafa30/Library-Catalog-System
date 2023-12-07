@@ -27,7 +27,6 @@ struct Book {
 
 
 // Function declarations
-bool doesIDExist(ifstream& primary, int x);
 void insertAuthorPrimary(char id[], short offset);
 void insertBookPrimary(char id[], short offset);
 void insertAuthorName(char name[], char ID[]);
@@ -59,27 +58,164 @@ void updateAuthorNameByID(int id, string newName, fstream &indexFile); // search
 void updateBookTitleByISBN(int isbn, string newTitle, fstream &indexFile); // search for the book by isbn and update the title
 
 int main() {
+    fstream AuthorFile("Author.txt", ios::in | ios::out | ios::binary);
+    fstream BookFile("Book.txt", ios::in | ios::out | ios::binary);
+    if (AuthorFile.tellg() == 0)
+        AuthorFile << -1 << endl;
+    if (BookFile.tellg() == 0)
+        BookFile << -1 << endl;
+    AuthorFile.close();
+    BookFile.close();
 
+    fstream PrimaryIndexAuthor("PrimaryIndexAuthor.txt", ios::in | ios::out | ios::binary);
+    fstream PrimaryIndexBook("PrimaryIndexBook.txt", ios::in | ios::out | ios::binary);
+    cout << "Welcome" << endl;
+    int option = 0;
 
+    while(option != 10){
+
+        cout << "1- Add New Author" << endl;
+        cout << "2- Add New Book" << endl;
+        cout << "3- Update Author Name (Author ID)" << endl;
+        cout << "4- Update Book Title (ISBN)" << endl;
+        cout << "5- Delete Book (ISBN)" << endl;
+        cout << "6- Delete Author (Author ID)" << endl;
+        cout << "7- Print Author (Author ID)" << endl;
+        cout << "8- Print Book (ISBN)" << endl;
+        cout << "9- Write Query" << endl;
+        cout << "10- Exit" << endl;
+
+        cout << "Please enter your choice" << endl;
+        cin >> option;
+
+        cin.ignore();
+        if(option == 1){
+            Author author;
+            cout << "Please enter Author ID" << endl;
+            cin >> author.authorID;
+            cout << "Please enter Author Name" << endl;
+            cin.ignore();
+            cin.getline(author.authorName , 30);
+            cout << "Please enter Author Address" << endl;
+//            cin.ignore();
+            cin.getline(author.address , 30);
+            addAuthor(author);
+        }
+        else if(option == 2){
+            Book book;
+            cout << "Please enter Book ISBN" << endl;
+            cin >> book.ISBN;
+            cout << "Please enter Book Title" << endl;
+            cin.ignore();
+            cin.getline(book.bookTitle , 30);
+            cout << "Please enter Author ID" << endl;
+            cin >> book.authorID;
+            addBook(book);
+        }
+        else if(option == 3){
+            int id;
+            string newName;
+            cout << "Please enter Author ID" << endl;
+            cin >> id;
+            cout << "Please enter Author New Name" << endl;
+            cin >> newName;
+            updateAuthorNameByID(id, newName, PrimaryIndexAuthor);
+        }
+        else if(option == 4){
+            int isbn;
+            string newTitle;
+            cout << "Please enter Book ISBN" << endl;
+            cin >> isbn;
+            cout << "Please enter Book New Title" << endl;
+            cin >> newTitle;
+            updateBookTitleByISBN(isbn, newTitle, PrimaryIndexBook);
+        }
+        else if(option == 5){
+            char isbn[15];
+            cout << "Please enter Book ISBN" << endl;
+            cin >> isbn;
+            deleteBook(isbn);
+        }
+        else if(option == 6){
+            char authorID[15];
+            cout << "Please enter Author ID" << endl;
+            cin >> authorID;
+            deleteAuthor(authorID);
+        }
+        else if(option == 7){
+            int id;
+            cout << "Please enter Author ID" << endl;
+            cin >> id;
+            printAuthorByID(getAuthorByID(id, PrimaryIndexAuthor));
+        }
+        else if(option == 8){
+            int isbn;
+            cout << "Please enter Book ISBN" << endl;
+            cin >> isbn;
+            printBookByISBN(getBookByISBN(isbn, PrimaryIndexBook));
+        }
+        else if(option == 9) {
+            string query;
+            cout << "Please enter your query" << endl;
+            cout << "Available queries: " << endl;
+            cout << "Select all from Authors where Author ID= number;" << endl;
+            cout << "Select all from Books where Author ID= number;" << endl;
+            cout << "Select Author from Authors where Author Name= name;" << endl;
+
+            getline(cin , query);
+            parseQuery(query);
+        }
+        else if(option == 10){
+            cout << "Goodbye" << endl;
+        }
+        else{
+            cout << "Invalid Option" << endl;
+        }
+
+    }
+//    parseQuery("Select all from Authors where Author ID= 88888;");
+//    parseQuery("Select all from Authors where Author ID= 1;");
+
+//    parseQuery("Select all from Books where Author ID= 1; ");
+//    parseQuery("Select all from Books where Author ID= 8888; ");
+
+//    parseQuery("Select Author from Authors where Author Name= Ali;");
+//    parseQuery("Select Author from Authors where Author Name= Shady;");
+//    printAuthorByID(4);
+//    printAuthorByID(68);
+//    printBookByISBN(25);
+//    printBookByISBN(4);
+
+//    fstream secondaryIndexFile("SecondaryIndexBook.txt", ios::in | ios::out | ios::binary);
+//    printBookByAuthorID(getBookByAuthorID(1, secondaryIndexFile));
+
+//    fstream secondaryIndexFile2("SecondaryIndexAuthor.txt", ios::in | ios::out | ios::binary);
+//    printAuthorByName(getAuthorByName("Ali", secondaryIndexFile2));
 //    Author author = {"1", "Ahmed", "Cairo"};
 //    Author author2 = {"2", "Mohamed", "Alex"};
 //    Author author3 = {"3", "Ali", "Giza"};
 //    Author author4 = {"4", "Mahmoud", "Aswan"};
 //    Author author5 = {"9", "Ali", "III"};
-    Author author = {"1", "ab", "cd"};
-//////
+//    Author author = {"55", "ab", "cd"};
+////////
 //    addAuthor(author);
 //    addAuthor(author2);
 //    addAuthor(author3);
 //    addAuthor(author4);
 //    addAuthor(author5);
-    addAuthor(author);
+//    addAuthor(author);
 
 //    deleteAuthor("1");
 //    deleteAuthor("2");
 //    deleteAuthor("3");
 //    deleteAuthor("4");
 //    deleteAuthor("9");
+
+//    fstream indexFile("PrimaryIndexAuthor.txt", ios::in | ios::out | ios::binary);
+//    updateAuthorNameByID(1, "Sh", indexFile);
+
+//    fstream indexFile2("PrimaryIndexBook.txt", ios::in | ios::out | ios::binary);
+//    updateBookTitleByISBN(1, "bb", indexFile2);
 //
 //    Book book = {"1", "C++", "1"};
 //    Book book2 = {"2", "Java", "2"};
@@ -93,6 +229,8 @@ int main() {
 
 //    deleteBook("2");
 //    deleteBook("4");
+
+
     return 0;
 }
 // A function that takes the authorID as a parameter and binary search for the authorID in the PrimaryIndexAuthor file
@@ -256,7 +394,7 @@ void printBookByISBN(int offset) {
     getline(ss, ISBN, '|');
     getline(ss, title, '|');
     getline(ss, authorID, '|');
-    cout << "ID: " << ISBN << "\nName: " << title << "\nAddress: " << authorID << endl;
+    cout << "ISBN: " << ISBN << "\nBook Title: " << title << "\nAuthor ID: " << authorID << endl;
 }
 vector<int> getBookByAuthorID(int id, fstream &secondaryIndexFile) {
     // open the secondaryIndexFile
@@ -543,42 +681,13 @@ void parseQuery(const string& query) {
     }
 }
 /**
- * Checks if a given ID already exists in the provided primary index file.
- *
- * @param primary The ifstream of the primary index file
- * @param x The ID to check for existence
- * @return true if the ID already exists, false otherwise
- */
-bool doesIDExist(ifstream& primary, int x) {
-    int tmp = 0;
-    short of = 0;
-
-    primary.seekg(0, ios::beg);
-
-    while (primary >> tmp >> of) {
-        if (tmp == x) {
-            return true; // ID already exists
-        }
-    }
-
-    return false; // ID does not exist
-}
-/**
  * Inserts a new record into the primary index file for authors.
  *
  * @param id The ID of the author to be inserted
  * @param offset The offset of the author record
  */
 void insertAuthorPrimary(char id[], short offset) {
-    ifstream primary("PrimaryIndexAuthor.txt");
     int x = atoi(id);
-
-    if (doesIDExist(primary, x)) {
-        cout << "ID already exists!" << endl;
-        return;
-    }
-
-    primary.close();
 
     // Read all records
     vector<pair<int, short>> records;
@@ -617,9 +726,7 @@ void insertAuthorPrimary(char id[], short offset) {
  * @param offset The offset of the book record
  */
 void insertBookPrimary(char id[], short offset){
-
     int x = atoi(id);
-
 
     // Read all records
     vector<pair<int, short>> records;
@@ -727,11 +834,6 @@ void insertAuthorName(char name[], char ID[]) {
             else
                 llFile1 << i << ' ' << data[i].second << ' ' << -1 << '\n';
         }
-
-        // Display the sorted data
-        for (int i = 0; i < data.size(); ++i) {
-            cout << data[i].first << ' ' << data[i].second << '\n';
-        }
     }
 }
 /**
@@ -834,9 +936,10 @@ string formatTwoBytes(int number) {
 void addAuthor(Author author) {
 
     //check if ID already exist
-    ifstream primary("PrimaryIndexAuthor.txt");
+    fstream primary("PrimaryIndexAuthor.txt");
 
-    if (doesIDExist(primary, atoi(author.authorID))) {
+    int x = atoi(author.authorID);
+    if (getAuthorByID(x , primary) != -1) {
         cout << "ID already exists!" << endl;
         return;
     }
@@ -876,7 +979,7 @@ void addAuthor(Author author) {
 
         file << recSize << author.authorID << '|' << author.authorName << '|' << author.address << '|';
         file.close();
-
+        cout << "The record is added successfully!" << endl;
     } else {
         int currentOffset = stoi(header);
         int count = 0;
@@ -914,6 +1017,7 @@ void addAuthor(Author author) {
                 file << recSize << author.authorID << '|' << author.authorName << '|' << author.address << '|';
 
                 file.close();
+                cout << "The record is added successfully!" << endl;
                 return;
             } else if (stoi(size) > (recordSize)) {
 
@@ -936,6 +1040,7 @@ void addAuthor(Author author) {
                 file << rest;
 
                 file.close();
+                cout << "The record is added successfully!" << endl;
                 return;
             } else {
                 offset = currentOffset;
@@ -953,6 +1058,7 @@ void addAuthor(Author author) {
                 file << recSize << author.authorID << '|' << author.authorName << '|' << author.address << '|';
 
                 file.close();
+                cout << "The record is added successfully!" << endl;
                 return;
             }
         }
@@ -967,9 +1073,9 @@ void addAuthor(Author author) {
 void addBook(Book book) {
 
     //check if ISBN already exist
-    ifstream primary("PrimaryIndexBook.txt");
-
-    if (doesIDExist(primary, atoi(book.ISBN))) {
+    fstream primary("PrimaryIndexBook.txt");
+    int x = atoi(book.ISBN);
+    if (getBookByISBN(x , primary) != -1) {
         cout << "ISBN already exists!" << endl;
         return;
     }
@@ -1009,6 +1115,8 @@ void addBook(Book book) {
 
         file << recSize << book.ISBN << '|' << book.bookTitle << '|' << book.authorID << '|';
         file.close();
+        cout << "The record is added successfully!" << endl;
+
 
     } else {
         int currentOffset = stoi(header);
@@ -1047,6 +1155,7 @@ void addBook(Book book) {
                 file << recSize << book.ISBN << '|' << book.bookTitle << '|' << book.authorID << '|';
 
                 file.close();
+                cout << "The record is added successfully!" << endl;
                 return;
             } else if (stoi(size) > (recordSize )) {
 
@@ -1069,6 +1178,7 @@ void addBook(Book book) {
                 file << rest;
 
                 file.close();
+                cout << "The record is added successfully!" << endl;
                 return;
             } else {
                 offset = currentOffset;
@@ -1086,6 +1196,7 @@ void addBook(Book book) {
                 file << recSize << book.ISBN << '|' << book.bookTitle << '|' << book.authorID << '|';
 
                 file.close();
+                cout << "The record is added successfully!" << endl;
                 return;
             }
         }
@@ -1093,15 +1204,7 @@ void addBook(Book book) {
 }
 
 void deleteBookPrimary(char id[]){
-    ifstream primary("PrimaryIndexBook.txt");
     int x = atoi(id);
-
-    if (!doesIDExist(primary, x)) {
-        cout << "ID doesn't exist!" << endl;
-        return;
-    }
-
-    primary.close();
 
     // Delete from PrimaryIndexBook.txt
     vector<pair<int, int>> data;
@@ -1123,14 +1226,7 @@ void deleteBookPrimary(char id[]){
 }
 
 void deleteAuthorPrimary(char id[]){
-    ifstream primary("PrimaryIndexAuthor.txt");
     int x = stoi(id);
-    if(!doesIDExist(primary , x)){
-        cout << "ID doesn't exsit!";
-        return;
-    }
-
-    primary.close();
 
     vector<pair<int , int>> data;
     ifstream readPrimary("PrimaryIndexAuthor.txt");
@@ -1267,13 +1363,18 @@ void deleteAuthorName(char name[] , char id[]) {
 }
 
 void deleteAuthor(char authorID[]) {
-    ifstream primary("PrimaryIndexAuthor.txt");
+    fstream primary("PrimaryIndexAuthor.txt");
     int ID = stoi(authorID);
-    if (!doesIDExist(primary, ID)) {
+    if (getAuthorByID(ID , primary) == -1) {
         cout << "ID doesn't exist!" << endl;
         return;
     }
     primary.close();
+
+    if(primary.tellg() == 0){
+        cout << "File is empty!" << endl;
+        return;
+    }
 
     // Opening the file in read/write mode
     fstream Author("Author.txt", ios::in | ios::out | ios::binary);
@@ -1358,17 +1459,24 @@ void deleteAuthor(char authorID[]) {
 
     sizeOfRecord = 0;
     Author.close();
+    cout << "The record is deleted successfully!" << endl;
+
 
 }
 
 void deleteBook(char ISBN[]) {
-    ifstream primary("PrimaryIndexBook.txt");
+    fstream primary("PrimaryIndexBook.txt");
     int isbn = stoi(ISBN);
-    if (!doesIDExist(primary, isbn)) {
+    if (getBookByISBN(isbn , primary) == -1) {
         cout << "isbn doesn't exist!" << endl;
         return;
     }
     primary.close();
+
+    if(primary.tellg() == 0){
+        cout << "File is empty!" << endl;
+        return;
+    }
 
     // Opening the file in read/write mode
     fstream Book("Book.txt", ios::in | ios::out | ios::binary);
@@ -1449,6 +1557,7 @@ void deleteBook(char ISBN[]) {
 
     sizeOfRecord = 0;
     Book.close();
+    cout << "The record is deleted successfully!" << endl;
 
 }
 void updateAuthorNameByID(int id, string newName, fstream &indexFile) {
@@ -1498,25 +1607,25 @@ void updateAuthorNameByID(int id, string newName, fstream &indexFile) {
             // I work as I use fixed fields
 
 
-            /*  // if she wants to update the author name in secondary file, so I will use add, delete functions
+//              // if she wants to update the author name in secondary file, so I will use add, delete functions
+//
+//                    Author a;
+//                    strcpy(a.authorID, ID.c_str());
+//                    strcpy(a.authorName, newName.c_str());
+//                    strcpy(a.address, address.c_str());
+//
+//                    author2.close();
+//                    char id[30];
+//                    for (int i = 0; i < 30; i++) {
+//                        id[i] = a.authorID[i];
+//                    }
+//                    deleteAuthor(id);
+//                    addAuthor(a);
+//
+//                    cout << "Author name is updated successfully!" << endl;
+//                    cout << "New Record is: " << endl;
+//                    cout << ID << "|" << newName << "|" << address << "|" << endl;
 
-                    Author a;
-                    strcpy(a.authorID, ID.c_str());
-                    strcpy(a.authorName, newName.c_str());
-                    strcpy(a.address, address.c_str());
-
-                    author2.close();
-                    char id[30];
-                    for (int i = 0; i < 30; i++) {
-                        id[i] = a.authorID[i];
-                    }
-                    deleteAuthor(id);
-                    addAuthor(a);
-
-                    cout << "Author name is updated successfully!" << endl;
-                    cout << "New Record is: " << endl;
-                    cout << ID << "|" << newName << "|" << address << "|" << endl;
-            */
 
 
             if (newName.length() <= 30) {      //new name is valid
@@ -1552,22 +1661,20 @@ void updateAuthorNameByID(int id, string newName, fstream &indexFile) {
                     cout << "|" << address << "|" << endl;
 
                 } else {     //name.length()<newName.length()
-
+                    author2.close();
                     cout << "\"We use internal fragmentation with Fixed Fields\": new name is longer than the old one!" << endl;
-                    // cout << "Do you want to continue? (y/n)" << endl;
                 }
             } else { //new name is too long (not valid)
-
+                author2.close();
                 cout << "Author name is too long!" << endl;
-                //   cout << "Do you want to continue? (y/n)" << endl;
             }
+            author2.close();
         } else {
             cout<<"Same record!"<<endl;
-            // cout << "Do you want to continue? (y/n)" << endl;
         }
     }else{
+        aut
         cout << "Author is NOT found!" << endl;
-        // cout << "Do you want to continue? (y/n)" << endl;
     }
 }
 
@@ -1671,17 +1778,14 @@ void updateBookTitleByISBN(int isbn, string newTitle, fstream &indexFile) {
 
                     cout << "\"We use internal fragmentation with Fixed Fields\": new title is longer than the old one!"
                          << endl;
-                    //   cout << "Do you want to continue? (y/n)" << endl;
                 }
             } else { //new title is too long (not valid)
                 cout << "Book title is too long!" << endl;
-                //   cout << "Do you want to continue? (y/n)" << endl;
             }
         } else {
             cout << "Same record!" << endl;
         }
     }else{
         cout<<"Book is NOT found!"<<endl;
-        // cout << "Do you want to continue? (y/n)" << endl;
     }
 }
