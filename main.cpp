@@ -27,6 +27,8 @@ struct Book {
 
 
 // Function declarations
+
+//Add
 void insertAuthorPrimary(char id[], short offset);
 void insertBookPrimary(char id[], short offset);
 void insertAuthorName(char name[], char ID[]);
@@ -34,7 +36,7 @@ void insertAuthorID(char authorID[], char ISBN[]);
 void addAuthor(Author author);
 void addBook(Book book);
 
-
+//Delete 
 void deleteBookPrimary(char id[]);
 void deleteAuthorPrimary(char id[]);
 void deleteAuthorID(char authorID[]);
@@ -42,7 +44,7 @@ void deleteAuthorName(char name[] , char ID[]);
 void deleteAuthor(char authorID[]);
 void deleteBook(char ISBN[]);
 
-
+//Search & Query 
 int getAuthorByID(int id, fstream &indexFile); // search for the author by id
 int getBookByISBN(int isbn, fstream &indexFile); // search for the book by isbn
 void printAuthorByID(int offset); // print the author record by offset
@@ -53,6 +55,7 @@ vector<int> getAuthorByName(string name, fstream &secondaryIndexFile); // search
 void printAuthorByName(const vector<int>& v); // print the author records
 void parseQuery(const string& query); // parse the query and call the appropriate function
 
+//Update 
 void updateAuthorNameByID(int id, string newName, fstream &indexFile); // search for the author by id and update the name
 void updateBookTitleByISBN(int isbn, string newTitle, fstream &indexFile); // search for the book by isbn and update the title
 
@@ -66,13 +69,14 @@ int main() {
     AuthorFile.close();
     BookFile.close();
 
-    fstream PrimaryIndexAuthor("PrimaryIndexAuthor.txt", ios::in | ios::out | ios::binary);
-    fstream PrimaryIndexBook("PrimaryIndexBook.txt", ios::in | ios::out | ios::binary);
     cout << "Welcome" << endl;
     int option = 0;
 
     while(option != 10){
 
+    fstream PrimaryIndexAuthor("PrimaryIndexAuthor.txt", ios::in | ios::out | ios::binary);
+    fstream PrimaryIndexBook("PrimaryIndexBook.txt", ios::in | ios::out | ios::binary);
+        
         cout << "1- Add New Author" << endl;
         cout << "2- Add New Book" << endl;
         cout << "3- Update Author Name (Author ID)" << endl;
@@ -171,64 +175,9 @@ int main() {
             cout << "Invalid Option" << endl;
         }
 
+        PrimaryIndexAuthor.close();
+        PrimaryIndexBook.close();
     }
-//    parseQuery("Select all from Authors where Author ID= 88888;");
-//    parseQuery("Select all from Authors where Author ID= 1;");
-
-//    parseQuery("Select all from Books where Author ID= 1; ");
-//    parseQuery("Select all from Books where Author ID= 8888; ");
-
-//    parseQuery("Select Author from Authors where Author Name= Ali;");
-//    parseQuery("Select Author from Authors where Author Name= Shady;");
-//    printAuthorByID(4);
-//    printAuthorByID(68);
-//    printBookByISBN(25);
-//    printBookByISBN(4);
-
-//    fstream secondaryIndexFile("SecondaryIndexBook.txt", ios::in | ios::out | ios::binary);
-//    printBookByAuthorID(getBookByAuthorID(1, secondaryIndexFile));
-
-//    fstream secondaryIndexFile2("SecondaryIndexAuthor.txt", ios::in | ios::out | ios::binary);
-//    printAuthorByName(getAuthorByName("Ali", secondaryIndexFile2));
-//    Author author = {"1", "Ahmed", "Cairo"};
-//    Author author2 = {"2", "Mohamed", "Alex"};
-//    Author author3 = {"3", "Ali", "Giza"};
-//    Author author4 = {"4", "Mahmoud", "Aswan"};
-//    Author author5 = {"9", "Ali", "III"};
-//    Author author = {"55", "ab", "cd"};
-////////
-//    addAuthor(author);
-//    addAuthor(author2);
-//    addAuthor(author3);
-//    addAuthor(author4);
-//    addAuthor(author5);
-//    addAuthor(author);
-
-//    deleteAuthor("1");
-//    deleteAuthor("2");
-//    deleteAuthor("3");
-//    deleteAuthor("4");
-//    deleteAuthor("9");
-
-//    fstream indexFile("PrimaryIndexAuthor.txt", ios::in | ios::out | ios::binary);
-//    updateAuthorNameByID(1, "Sh", indexFile);
-
-//    fstream indexFile2("PrimaryIndexBook.txt", ios::in | ios::out | ios::binary);
-//    updateBookTitleByISBN(1, "bb", indexFile2);
-//
-//    Book book = {"1", "C++", "1"};
-//    Book book2 = {"2", "Java", "2"};
-//    Book book3 = {"3", "Python", "3"};
-//    Book book4 = {"4", "C", "4"};
-//
-//    addBook(book);
-//    addBook(book2);
-//    addBook(book3);
-//    addBook(book4);
-
-//    deleteBook("2");
-//    deleteBook("4");
-
 
     return 0;
 }
