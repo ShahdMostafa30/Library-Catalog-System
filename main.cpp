@@ -53,8 +53,8 @@ int main() {
     cout<<"Address: \n";
     cin>>author.address;
     addAuthor(author);
-//
-//    deleteAuthor("1");
+
+//    deleteAuthor("5");
 //fstream primary("PrimaryIndexAuthor.txt");
 //cout<<getAuthorByID(1,primary);
 
@@ -441,7 +441,7 @@ void addAuthor(Author author) {
 
                 file << recSize << author.authorID << '|' << author.authorName << '|' << author.address << '|';
 
-                string rest = string(stoi(size) - recordSize - 2, '#');
+                string rest = string(stoi(size) - recordSize, '#');
                 file << rest;
 
                 file.close();
@@ -574,7 +574,7 @@ void addBook(Book book) {
 
                 file << recSize << book.ISBN << '|' << book.bookTitle << '|' << book.authorID << '|';
 
-                string rest = string(stoi(size) - recordSize - 2, '#');
+                string rest = string(stoi(size) - recordSize, '#');
                 file << rest;
 
                 file.close();
