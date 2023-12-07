@@ -1,0 +1,65 @@
+Index: main.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\r\n#include<bits/stdc++.h>\r\n\r\nusing namespace std;\r\n\r\n//Files:\r\n//For Primary index -> PrimaryIndexAuthor , PrimaryIndexBook -> ( ID, offset)\r\n//For Secondary index -> SecondaryIndexAuthor ->(Name, Pointer)\r\n//                    -> SecondaryIndexBook ->(AuthorID, pointer)\r\n//For Linked List -> LLAuthor ->(#, ID(for author), Pointer)\r\n//                -> LLBook   ->(#, ID(for book), Pointer)\r\n\r\nstruct Author {\r\n    char authorID[15];\r\n    char authorName[30];\r\n    char address[30];\r\n};\r\n\r\nstruct Book {\r\n    char ISBN[15];\r\n    char bookTitle[30];\r\n    char authorID[30];\r\n};\r\n\r\n\r\n// Function declarations\r\nbool doesIDExist(ifstream& primary, int x);\r\nvoid insertAuthorPrimary(char id[], short offset);\r\nvoid insertBookPrimary(char id[], short offset);\r\nvoid insertAuthorName(char name[], char ID[]);\r\nvoid insertAuthorID(char authorID[], char ISBN[]);\r\nvoid addAuthor(Author author);\r\nvoid addBook(Book book);\r\n\r\n\r\n\r\n\r\nint main() {\r\n    \r\n\r\n    return 0;\r\n}\r\n/**\r\n * Checks if a given ID already exists in the provided primary index file.\r\n *\r\n * @param primary The ifstream of the primary index file\r\n * @param x The ID to check for existence\r\n * @return true if the ID already exists, false otherwise\r\n */\r\nbool doesIDExist(ifstream& primary, int x) {\r\n    int tmp = 0;\r\n    short of = 0;\r\n\r\n    primary.seekg(0, ios::beg);\r\n\r\n    while (primary >> tmp >> of) {\r\n        if (tmp == x) {\r\n            return true; // ID already exists\r\n        }\r\n    }\r\n\r\n    return false; // ID does not exist\r\n}\r\n/**\r\n * Inserts a new record into the primary index file for authors.\r\n *\r\n * @param id The ID of the author to be inserted\r\n * @param offset The offset of the author record\r\n */\r\nvoid insertAuthorPrimary(char id[], short offset) {\r\n    ifstream primary(\"PrimaryIndexAuthor.txt\");\r\n    int x = atoi(id);\r\n\r\n    if (doesIDExist(primary, x)) {\r\n        cout << \"ID already exists!\" << endl;\r\n        return;\r\n    }\r\n\r\n    primary.close();\r\n\r\n    // Read all records\r\n    vector<pair<int, short>> records;\r\n\r\n    ifstream readPrimary(\"PrimaryIndexAuthor.txt\");\r\n    int tmp;\r\n    short of;\r\n\r\n    while (readPrimary >> tmp >> of) {\r\n        records.push_back(make_pair(tmp, of));\r\n    }\r\n\r\n    readPrimary.close();\r\n\r\n    // Insert the new record into the correct position\r\n    auto it = records.begin();\r\n    while (it != records.end() && it->first < x) {\r\n        ++it;\r\n    }\r\n\r\n    records.insert(it, make_pair(x, offset));\r\n\r\n    // Rewrite all records into the file in sorted order\r\n    ofstream writePrimary(\"PrimaryIndexAuthor.txt\", ios::trunc);\r\n\r\n    for (const auto& record : records) {\r\n        writePrimary << record.first << ' ' << record.second << '\\n';\r\n    }\r\n\r\n    writePrimary.close();\r\n}\r\n/**\r\n * Inserts a new record into the primary index file for books.\r\n *\r\n * @param id The ID of the book to be inserted\r\n * @param offset The offset of the book record\r\n */\r\nvoid insertBookPrimary(char id[], short offset){\r\n    ifstream primary(\"PrimaryIndexBook.txt\");\r\n    int x = atoi(id);\r\n\r\n    if (doesIDExist(primary, x)) {\r\n        cout << \"ID already exists!\" << endl;\r\n        return;\r\n    }\r\n\r\n    primary.close();\r\n\r\n    // Read all records\r\n    vector<pair<int, short>> records;\r\n\r\n    ifstream readPrimary(\"PrimaryIndexBook.txt\");\r\n    int tmp;\r\n    short of;\r\n\r\n    while (readPrimary >> tmp >> of) {\r\n        records.push_back(make_pair(tmp, of));\r\n    }\r\n\r\n    readPrimary.close();\r\n\r\n    // Insert the new record into the correct position\r\n    auto it = records.begin();\r\n    while (it != records.end() && it->first < x) {\r\n        ++it;\r\n    }\r\n\r\n    records.insert(it, make_pair(x, offset));\r\n\r\n    // Rewrite all records into the file in sorted order\r\n    ofstream writePrimary(\"PrimaryIndexBook.txt\", ios::trunc);\r\n\r\n    for (const auto& record : records) {\r\n        writePrimary << record.first << ' ' << record.second << '\\n';\r\n    }\r\n\r\n    writePrimary.close();\r\n}\r\n/**\r\n * Inserts a new record into the linked list and secondary index files for authors.\r\n *\r\n * @param name The name of the author to be inserted\r\n * @param ID The ID of the author\r\n */\r\n\r\nvoid insertAuthorName(char name[], char ID[]) {\r\n    vector<pair<string, string>> data;\r\n    ifstream file(\"SecondaryIndexAuthor.txt\", ios::ate);\r\n\r\n    // Check if the file is empty\r\n    if (file.tellg() == 0) {\r\n        // If file is empty, create and write initial records\r\n        ofstream secFile(\"SecondaryIndexAuthor.txt\");\r\n        secFile << name << ' ' << 0 << '\\n';\r\n        secFile.close();\r\n\r\n        ofstream llFile(\"LLAuthor.txt\");\r\n        llFile << 0 << ' ' << ID << ' ' << -1 << '\\n';\r\n        llFile.close();\r\n    } else {\r\n        // File not empty, read and process records\r\n        ifstream secFile(\"SecondaryIndexAuthor.txt\");\r\n        ifstream llFile(\"LLAuthor.txt\");\r\n        string n, id;\r\n        int secPointer, llPointer, x;\r\n\r\n        // Loop through records in SecondaryIndexAuthor.txt\r\n        while (secFile >> n >> secPointer) {\r\n            llFile.clear();\r\n            llFile.seekg(0, ios::beg);\r\n\r\n            // Match found in SecondaryIndexAuthor.txt\r\n            while (llFile >> llPointer >> id >> x) {\r\n                if (secPointer == llPointer) {\r\n                    data.push_back(make_pair(n, id));\r\n\r\n                    // If x is not -1, continue pushing IDs until x is -1\r\n                    while (x != -1) {\r\n                        llFile >> llPointer >> id >> x;\r\n                        data.push_back(make_pair(n, id));\r\n                    }\r\n\r\n                    break; // Stop after processing IDs with x = -1\r\n                }\r\n            }\r\n        }\r\n\r\n        secFile.close();\r\n        llFile.close();\r\n\r\n        // Add the new name and ID\r\n        data.push_back(make_pair(name, ID));\r\n\r\n        // Define a lambda comparator to sort based on pair.first\r\n        auto compareFirst = [](const auto& a, const auto& b) {\r\n            return a.first < b.first;\r\n        };\r\n        // Sort the vector based on pair.first\r\n        sort(data.begin(), data.end(), compareFirst);\r\n\r\n        // Write sorted data back to files\r\n        ofstream secFile1(\"SecondaryIndexAuthor.txt\", ios::trunc);\r\n        ofstream llFile1(\"LLAuthor.txt\", ios::trunc);\r\n\r\n        // Write to SecondaryIndexAuthor.txt and LLAuthor.txt\r\n        for (int i = 0; i < data.size(); ++i) {\r\n            if (i == 0 || data[i].first != data[i - 1].first)\r\n                secFile1 << data[i].first << ' ' << i << '\\n';\r\n\r\n            if (data[i].first == data[i + 1].first)\r\n                llFile1 << i << ' ' << data[i].second << ' ' << i + 1 << '\\n';\r\n            else\r\n                llFile1 << i << ' ' << data[i].second << ' ' << -1 << '\\n';\r\n        }\r\n\r\n        // Display the sorted data\r\n        for (int i = 0; i < data.size(); ++i) {\r\n            cout << data[i].first << ' ' << data[i].second << '\\n';\r\n        }\r\n    }\r\n}\r\n/**\r\n * Inserts a new record into the linked list and secondary index files for books.\r\n *\r\n * @param authorID The ID of the author to be inserted\r\n * @param ISBN The ISBN of the book associated with the author\r\n */\r\n\r\nvoid insertAuthorID(char authorID[], char ISBN[]) {\r\n    vector<pair<string, string>> data;\r\n    ifstream file(\"SecondaryIndexBook.txt\", ios::ate);\r\n\r\n    // Check if the file is empty\r\n    if (file.tellg() == 0) {\r\n        // If file is empty, create and write initial records\r\n        ofstream secFile(\"SecondaryIndexBook.txt\");\r\n        secFile << authorID << ' ' << 0 << '\\n';\r\n        secFile.close();\r\n\r\n        ofstream llFile(\"LLBook.txt\");\r\n        llFile << 0 << ' ' << ISBN << ' ' << -1 << '\\n';\r\n        llFile.close();\r\n    } else {\r\n        // File not empty, read and process records\r\n        ifstream secFile(\"SecondaryIndexBook.txt\");\r\n        ifstream llFile(\"LLBook.txt\");\r\n        string autID, isbn;\r\n        int secPointer, llPointer, x;\r\n\r\n        // Loop through records in SecondaryIndexAuthor.txt\r\n        while (secFile >> autID >> secPointer) {\r\n            llFile.clear();\r\n            llFile.seekg(0, ios::beg);\r\n\r\n            // Match found in SecondaryIndexAuthor.txt\r\n            while (llFile >> llPointer >> isbn >> x) {\r\n                if (secPointer == llPointer) {\r\n                    data.push_back(make_pair(autID, isbn));\r\n\r\n                    // If x is not -1, continue pushing IDs until x is -1\r\n                    while (x != -1) {\r\n                        llFile >> llPointer >> isbn >> x;\r\n                        data.push_back(make_pair(autID, isbn));\r\n                    }\r\n\r\n                    break; // Stop after processing IDs with x = -1\r\n                }\r\n            }\r\n        }\r\n\r\n        secFile.close();\r\n        llFile.close();\r\n\r\n        // Add the new name and ID\r\n        data.push_back(make_pair(authorID, ISBN));\r\n\r\n        // Define a lambda comparator to sort based on pair.first\r\n        auto compareFirst = [](const auto& a, const auto& b) {\r\n            return a.first < b.first;\r\n        };\r\n        // Sort the vector based on pair.first\r\n        sort(data.begin(), data.end(), compareFirst);\r\n\r\n        // Write sorted data back to files\r\n        ofstream secFile1(\"SecondaryIndexBook.txt\", ios::trunc);\r\n        ofstream llFile1(\"LLBook.txt\", ios::trunc);\r\n\r\n        // Write to SecondaryIndexBook.txt and LLBook.txt\r\n        for (int i = 0; i < data.size(); ++i) {\r\n            if (i == 0 || data[i].first != data[i - 1].first)\r\n                secFile1 << data[i].first << ' ' << i << '\\n';\r\n\r\n            if (data[i].first == data[i + 1].first)\r\n                llFile1 << i << ' ' << data[i].second << ' ' << i + 1 << '\\n';\r\n            else\r\n                llFile1 << i << ' ' << data[i].second << ' ' << -1 << '\\n';\r\n        }\r\n\r\n        // Display the sorted data\r\n        for (int i = 0; i < data.size(); ++i) {\r\n            cout << data[i].first << ' ' << data[i].second << '\\n';\r\n        }\r\n    }\r\n}\r\n\r\nvoid addAuthor(Author author){\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.cpp b/main.cpp
+--- a/main.cpp	
++++ b/main.cpp	
+@@ -31,14 +31,43 @@
+ void insertAuthorID(char authorID[], char ISBN[]);
+ void addAuthor(Author author);
+ void addBook(Book book);
+-
+-
++///////////////////////
++//void deleteAuthorPrimary(char id[]);
++void deleteBookPrimary(char id[]);
++void deleteBook(char ISBN[]);
++//void deleteAuthorName(char authorName[]);
++//void deleteAuthorID(char authorID[]);
++//void deleteAuthor(char authorID[]);
+ 
+ 
+ int main() {
+-    
++    cout << "Welcome "<< endl;
++    while(true)
++    {
++        cout << "Choose one of the following options:\n"
++                "1. Add New Author \n"
++                "2. Add New Book\n"
++                "3. Update Author Name(Author ID)\n"
++                "4. Update Book Title(ISBN)\n"
++                "5. Delete Book(ISBN)\n"
++                "6. Delete Author(Author ID)\n"
++                "7. Print Author(Author ID)\n"
++                "8. Print Book(ISBN)\n"
++                "9. Write Query\n"
++                "10. Exit Program\n"
++                "Enter number of option :";
+ 
+-    return 0;
++        int option;
++        cin >> option;
++        if (option == 5){
++            char ISBN[15];
++            cout << "Enter ISBN of the book you want to delete: ";
++            cin >> ISBN;
++            deleteBook(ISBN);
++        }
++        else if (option == 10)
++            break;
++    }
+ }
+ /**
+  * Checks if a given ID already exists in the provided primary index file.
+@@ -325,3 +354,6 @@
+ void addAuthor(Author author){
+ 
+ }
++/**************************************************/
++
++

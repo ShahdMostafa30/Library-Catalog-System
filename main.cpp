@@ -1659,6 +1659,8 @@ void updateAuthorNameByID(int id, string newName, fstream &indexFile) {
                 } else {     //name.length()<newName.length()
                     author2.close();
                     cout << "\"We use internal fragmentation with Fixed Fields\": new name is longer than the old one!" << endl;
+                    exit(0);
+
                 }
             } else { //new name is too long (not valid)
                 author2.close();

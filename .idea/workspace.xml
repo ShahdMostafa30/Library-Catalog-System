@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="CMakePresetLoader">{
   &quot;useNewFormat&quot;: true
 }</component>
@@ -17,10 +20,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fe2eed22-5c59-4499-a7bc-aaf583cec4d6" name="Changes" comment="adding main and the structure of the program">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" afterDir="false" />
-    </list>
+    <list default="true" id="fe2eed22-5c59-4499-a7bc-aaf583cec4d6" name="Changes" comment="Final Add &amp; Delete &amp; Search Functions(Tested Version)" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,6 +31,11 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -54,16 +59,16 @@
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/101/Documents/GitHub/Files_A1&quot;
+    &quot;last_opened_file_path&quot;: &quot;D:/3rd year/1st semester/Files/main (2).cpp&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
   <component name="RunManager">
     <configuration name="Files_A1" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Files_A1" TARGET_NAME="Files_A1" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Files_A1" RUN_TARGET_NAME="Files_A1">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -81,6 +86,15 @@
       <workItem from="1700766473938" duration="150000" />
       <workItem from="1700766656834" duration="23000" />
       <workItem from="1700766690875" duration="1000" />
+      <workItem from="1701439730890" duration="2448000" />
+      <workItem from="1701452656665" duration="599000" />
+      <workItem from="1701719861501" duration="15322000" />
+      <workItem from="1701777937249" duration="6205000" />
+      <workItem from="1701794520064" duration="13383000" />
+      <workItem from="1701867888584" duration="31591000" />
+      <workItem from="1701901378938" duration="33000" />
+      <workItem from="1701901416678" duration="3712000" />
+      <workItem from="1701947355006" duration="23386000" />
     </task>
     <task id="LOCAL-00001" summary="adding main and the structure of the program">
       <created>1700766344248</created>
@@ -89,7 +103,91 @@
       <option name="project" value="LOCAL" />
       <updated>1700766344248</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Added deleteBookPrimary function">
+      <created>1701729546458</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1701729546458</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Added deleteAuthorPrimary function">
+      <created>1701731274225</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1701731274225</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Added deleteAuthorID function">
+      <created>1701813993518</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1701813993518</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Added deleteAuthorName function">
+      <created>1701816106208</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1701816106208</updated>
+    </task>
+    <task id="LOCAL-00006" summary="v1 delete function">
+      <created>1701874950135</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1701874950135</updated>
+    </task>
+    <task id="LOCAL-00007" summary="v2 delete function">
+      <created>1701900958586</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1701900958586</updated>
+    </task>
+    <task id="LOCAL-00008" summary="v3 delete function(Final)">
+      <created>1701903468645</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1701903468645</updated>
+    </task>
+    <task id="LOCAL-00009" summary="v3 deleteBook function(Final)">
+      <created>1701905154650</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1701905154650</updated>
+    </task>
+    <task id="LOCAL-00010" summary="delete cout statments from functions">
+      <created>1701952828960</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1701952828960</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Final Add &amp; Delete Function (Tested Version)">
+      <created>1701970239099</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1701970239099</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Added Menu for user">
+      <created>1701976820429</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1701976820429</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Final Add &amp; Delete &amp; Search Functions(Tested Version)">
+      <created>1701977611964</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1701977611964</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -100,7 +198,24 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="true" />
+                </map>
+              </option>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -108,6 +223,18 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="adding main and the structure of the program" />
-    <option name="LAST_COMMIT_MESSAGE" value="adding main and the structure of the program" />
+    <MESSAGE value="Added deleteBookPrimary function" />
+    <MESSAGE value="Added deleteAuthorPrimary function" />
+    <MESSAGE value="Added deleteAuthorID function" />
+    <MESSAGE value="Added deleteAuthorName function" />
+    <MESSAGE value="v1 delete function" />
+    <MESSAGE value="v2 delete function" />
+    <MESSAGE value="v3 delete function(Final)" />
+    <MESSAGE value="v3 deleteBook function(Final)" />
+    <MESSAGE value="delete cout statments from functions" />
+    <MESSAGE value="Final Add &amp; Delete Function (Tested Version)" />
+    <MESSAGE value="Added Menu for user" />
+    <MESSAGE value="Final Add &amp; Delete &amp; Search Functions(Tested Version)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Final Add &amp; Delete &amp; Search Functions(Tested Version)" />
   </component>
 </project>
