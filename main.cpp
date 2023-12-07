@@ -60,6 +60,7 @@ void updateAuthorNameByID(int id, string newName, fstream &indexFile); // search
 void updateBookTitleByISBN(int isbn, string newTitle, fstream &indexFile); // search for the book by isbn and update the title
 
 int main() {
+    
     fstream AuthorFile("Author.txt", ios::in | ios::out | ios::binary);
     fstream BookFile("Book.txt", ios::in | ios::out | ios::binary);
     if (AuthorFile.tellg() == 0)
