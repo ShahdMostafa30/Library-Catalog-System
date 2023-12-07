@@ -1,2 +1,3 @@
-Maryam 0
-Shahd 1
+Hend 0
+Maryam 1
+Try 2

@@ -94,7 +94,7 @@
       <workItem from="1701867888584" duration="31591000" />
       <workItem from="1701901378938" duration="33000" />
       <workItem from="1701901416678" duration="3712000" />
-      <workItem from="1701947355006" duration="23386000" />
+      <workItem from="1701947355006" duration="23760000" />
     </task>
     <task id="LOCAL-00001" summary="adding main and the structure of the program">
       <created>1700766344248</created>
@@ -187,7 +187,14 @@
       <option name="project" value="LOCAL" />
       <updated>1701977611964</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Final Add &amp; Delete &amp; Search Functions(Tested Version)">
+      <created>1701978497819</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1701978497819</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -209,7 +216,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="main" />
+                        <option value="origin/main" />
                       </list>
                     </value>
                   </entry>
