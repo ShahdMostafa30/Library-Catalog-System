@@ -45,16 +45,16 @@ int getAuthorByID(int id, fstream &indexFile);
 int main() {
 
 
-//    Author author;
-//    cout<<"Name: \n";
-//    cin>>author.authorName;
-//    cout<<"ID: \n";
-//    cin>>author.authorID;
-//    cout<<"Address: \n";
-//    cin>>author.address;
-//    addAuthor(author);
-
-    deleteAuthor("1");
+    Author author;
+    cout<<"Name: \n";
+    cin>>author.authorName;
+    cout<<"ID: \n";
+    cin>>author.authorID;
+    cout<<"Address: \n";
+    cin>>author.address;
+    addAuthor(author);
+//
+//    deleteAuthor("1");
 //fstream primary("PrimaryIndexAuthor.txt");
 //cout<<getAuthorByID(1,primary);
 
@@ -405,7 +405,7 @@ void addAuthor(Author author) {
                 size += ch;
 
             // If there is enough space at the current position to insert the new record
-            if (stoi(size) == (recordSize + 2)) {
+            if (stoi(size) == (recordSize)) {
 
                 if(count == 0){ //if insert in last deleted record
                     file.seekp(0);
@@ -424,7 +424,7 @@ void addAuthor(Author author) {
 
                 file.close();
                 return;
-            } else if (stoi(size) > (recordSize + 2)) {
+            } else if (stoi(size) > (recordSize)) {
 
                 if(count == 0){ //if insert in last deleted record
                     file.seekp(0);
@@ -538,7 +538,7 @@ void addBook(Book book) {
                 size += ch;
 
             // If there is enough space at the current position to insert the new record
-            if (stoi(size) == (recordSize + 2)) {
+            if (stoi(size) == (recordSize)) {
 
                 if(count == 0){ //if insert in last deleted record
                     file.seekp(0);
@@ -557,7 +557,7 @@ void addBook(Book book) {
 
                 file.close();
                 return;
-            } else if (stoi(size) > (recordSize + 2)) {
+            } else if (stoi(size) > (recordSize)) {
 
                 if(count == 0){ //if insert in last deleted record
                     file.seekp(0);
@@ -1318,7 +1318,7 @@ void deleteAuthor(char authorID[]) {
     Author.seekp(0 , ios::beg);
     Author << header;
     cout << "header " << header << endl;
-    
+
     deleteAuthorPrimary(authorID);
 
     sizeOfRecord = 0;
