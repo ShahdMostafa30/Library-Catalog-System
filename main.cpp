@@ -57,21 +57,19 @@ void updateAuthorNameByID(int id, string newName, fstream &indexFile); // search
 void updateBookTitleByISBN(int isbn, string newTitle, fstream &indexFile); // search for the book by isbn and update the title
 
 int main() {
-    fstream AuthorFile("Author.txt", ios::in | ios::out | ios::binary);
-    fstream BookFile("Book.txt", ios::in | ios::out | ios::binary);
-    if (AuthorFile.tellg() == 0)
-        AuthorFile << -1 << endl;
-    if (BookFile.tellg() == 0)
-        BookFile << -1 << endl;
-    AuthorFile.close();
-    BookFile.close();
-
-    fstream PrimaryIndexAuthor("PrimaryIndexAuthor.txt", ios::in | ios::out | ios::binary);
-    fstream PrimaryIndexBook("PrimaryIndexBook.txt", ios::in | ios::out | ios::binary);
     cout << "Welcome" << endl;
     int option = 0;
 
     while(option != 10){
+        fstream PrimaryIndexAuthor("PrimaryIndexAuthor.txt", ios::in | ios::out | ios::binary);
+        fstream PrimaryIndexBook("PrimaryIndexBook.txt", ios::in | ios::out | ios::binary);
+        fstream AuthorFile("Author.txt", ios::in | ios::out | ios::binary);
+        fstream BookFile("Book.txt", ios::in | ios::out | ios::binary);
+        if (AuthorFile.tellg() == 0)
+            AuthorFile << -1 << endl;
+        if (BookFile.tellg() == 0)
+            BookFile << -1 << endl;
+
 
         cout << "1- Add New Author" << endl;
         cout << "2- Add New Book" << endl;
@@ -170,7 +168,10 @@ int main() {
         else{
             cout << "Invalid Option" << endl;
         }
-
+        AuthorFile.close();
+        BookFile.close();
+        PrimaryIndexAuthor.close();
+        PrimaryIndexBook.close();
     }
 //    parseQuery("Select all from Authors where Author ID= 88888;");
 //    parseQuery("Select all from Authors where Author ID= 1;");

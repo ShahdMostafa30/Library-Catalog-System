@@ -14,13 +14,23 @@
       <config projectName="Files_A1" targetName="Files_A1" />
     </generated>
   </component>
-  <component name="CMakeSettings">
+  <component name="CMakeSettings" AUTO_RELOAD="true">
     <configurations>
       <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fe2eed22-5c59-4499-a7bc-aaf583cec4d6" name="Changes" comment="Final Add &amp; Delete &amp; Search Functions(Tested Version)" />
+    <list default="true" id="fe2eed22-5c59-4499-a7bc-aaf583cec4d6" name="Changes" comment="Final Add &amp; Delete &amp; Search Functions(Tested Version)">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/.ninja_deps" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/.ninja_deps" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/.ninja_log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/.ninja_log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Author.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Author.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Files_A1.dir/main.cpp.obj" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Files_A1.dir/main.cpp.obj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Files_A1.exe" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Files_A1.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/SecondaryIndexAuthor.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/SecondaryIndexAuthor.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Testing/Temporary/LastTest.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Testing/Temporary/LastTest.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -73,6 +83,11 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -95,6 +110,8 @@
       <workItem from="1701901378938" duration="33000" />
       <workItem from="1701901416678" duration="3712000" />
       <workItem from="1701947355006" duration="23760000" />
+      <workItem from="1701978561628" duration="3497000" />
+      <workItem from="1702036939967" duration="736000" />
     </task>
     <task id="LOCAL-00001" summary="adding main and the structure of the program">
       <created>1700766344248</created>
@@ -194,7 +211,14 @@
       <option name="project" value="LOCAL" />
       <updated>1701978497819</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Final Add &amp; Delete &amp; Search Functions(Tested Version)">
+      <created>1701980042401</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1701980042401</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
