@@ -58,9 +58,9 @@ void updateBookTitleByISBN(int isbn, string newTitle, fstream &indexFile); // se
 
 int main() {
     cout << "Welcome" << endl;
-    int option = 0;
+    int choice = 0;
 
-    while(option != 10){
+    while(choice != 10){
         fstream PrimaryIndexAuthor("PrimaryIndexAuthor.txt", ios::in | ios::out | ios::binary);
         fstream PrimaryIndexBook("PrimaryIndexBook.txt", ios::in | ios::out | ios::binary);
         fstream AuthorFile("Author.txt", ios::in | ios::out | ios::binary);
@@ -83,10 +83,10 @@ int main() {
         cout << "10- Exit" << endl;
 
         cout << "Please enter your choice" << endl;
-        cin >> option;
+        cin >> choice;
 
         cin.ignore();
-        if(option == 1){
+        if(choice == 1){
             Author author;
             cout << "Please enter Author ID" << endl;
             cin >> author.authorID;
@@ -98,7 +98,7 @@ int main() {
             cin.getline(author.address , 30);
             addAuthor(author);
         }
-        else if(option == 2){
+        else if(choice == 2){
             Book book;
             cout << "Please enter Book ISBN" << endl;
             cin >> book.ISBN;
@@ -109,7 +109,7 @@ int main() {
             cin >> book.authorID;
             addBook(book);
         }
-        else if(option == 3){
+        else if(choice == 3){
             int id;
             string newName;
             cout << "Please enter Author ID" << endl;
@@ -118,7 +118,7 @@ int main() {
             cin >> newName;
             updateAuthorNameByID(id, newName, PrimaryIndexAuthor);
         }
-        else if(option == 4){
+        else if(choice == 4){
             int isbn;
             string newTitle;
             cout << "Please enter Book ISBN" << endl;
@@ -127,31 +127,31 @@ int main() {
             cin >> newTitle;
             updateBookTitleByISBN(isbn, newTitle, PrimaryIndexBook);
         }
-        else if(option == 5){
+        else if(choice == 5){
             char isbn[15];
             cout << "Please enter Book ISBN" << endl;
             cin >> isbn;
             deleteBook(isbn);
         }
-        else if(option == 6){
+        else if(choice == 6){
             char authorID[15];
             cout << "Please enter Author ID" << endl;
             cin >> authorID;
             deleteAuthor(authorID);
         }
-        else if(option == 7){
+        else if(choice == 7){
             int id;
             cout << "Please enter Author ID" << endl;
             cin >> id;
             printAuthorByID(getAuthorByID(id, PrimaryIndexAuthor));
         }
-        else if(option == 8){
+        else if(choice == 8){
             int isbn;
             cout << "Please enter Book ISBN" << endl;
             cin >> isbn;
             printBookByISBN(getBookByISBN(isbn, PrimaryIndexBook));
         }
-        else if(option == 9) {
+        else if(choice == 9) {
             string query;
             cout << "Please enter your query" << endl;
             cout << "Available queries: " << endl;
@@ -162,7 +162,7 @@ int main() {
             getline(cin , query);
             parseQuery(query);
         }
-        else if(option == 10){
+        else if(choice == 10){
             cout << "Goodbye" << endl;
         }
         else{
