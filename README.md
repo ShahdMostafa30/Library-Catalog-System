@@ -29,15 +29,18 @@ Updates AVAIL LIST and indexes accordingly.
 ### 8. Print Book Data with (ISBN)
 ### 9. Write Query
 o Select all from Authors where Author ID=’xxx’; // this query will use primary index to get the
-results
+results.
+
 o Select all from Books where Author ID=’xxx’; // this query will use secondary index to get the
 results.
+
 o Select Author Name from Authors where Author ID=’xxx’; // this query will use secondary
 index to get the results.
+
 ### 10. Exit
 
 
-## Project File Structures
+## Project Files Structure
 | File | Content | Structure |
 | -------- | -------- | -------- |
 | main.cpp | code | C++ code |
@@ -51,9 +54,14 @@ index to get the results.
 | LLAuthor.txt | Linked list file for Author using a hash value from the author secondary index file, Author ID, and a pointer to the author record in the author data file separated with a single space | #, Author ID, Pointer(byte offset) |
 | LLBook.txt | Linked list file for Book using a hash value from the author secondary index file, Book ISBN, and a pointer to the book record in the author data file separated with a single space | #, Book ISBN, Pointer(byte offset) |
 
+## Dependencies
+No files or dependecies required, just make sure you run C++ 17 and include C++ external libraries.
 
+## Contributing 
+Contributions to this project are welcomed. Feel free to fork the repository and create pull requests for improvements or additional features.
 
-
-
-
-   
+## Contributers
+- [Hend Ahmad](https://github.com/LifelongLearner-HEND)
+- [Shahd Mostafa](https://github.com/ShahdMostafa30)
+- [Shahd Osama](https://github.com/shahdosama10)
+- [Maryam Osama](https://github.com/maryamosama33)
