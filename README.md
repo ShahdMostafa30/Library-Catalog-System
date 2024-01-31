@@ -7,6 +7,36 @@ In this project, a simple library catalog system is implemented using text files
 3. Multilevel indexes.
 4. Internal fragmentation for memory usage.
 
+## Menu and Features 
+### 1. Add new author
+Allows administrators to add a new author record.
+Checks the AVAIL LIST for available records before adding a new one.
+Updates indexes accordingly.
+### 2. Add New Book
+Allows administrators to add a new book record.
+Checks the AVAIL LIST for available records before adding a new one.
+Updates indexes accordingly.
+### 3. Update Author Name with Author ID
+Allows administrators to update non-key fields of existing records.
+Ensures updates do not exceed allocated size.
+Updates indexes accordingly.
+### 4. Update Book Title with ISBN
+### 5. Delete Book with (ISBN)
+Marks a record with a (*) marker instead of physically deleting it.
+Updates AVAIL LIST and indexes accordingly.
+### 6. Delete Author (Author ID)
+### 7. Print Author Data with (Author ID)
+### 8. Print Book Data with (ISBN)
+### 9. Write Query
+o Select all from Authors where Author ID=’xxx’; // this query will use primary index to get the
+results
+o Select all from Books where Author ID=’xxx’; // this query will use secondary index to get the
+results.
+o Select Author Name from Authors where Author ID=’xxx’; // this query will use secondary
+index to get the results.
+### 10. Exit
+
+
 ## Project File Structures
 | File | Content | Structure |
 | -------- | -------- | -------- |
