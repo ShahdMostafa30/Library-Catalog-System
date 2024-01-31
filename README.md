@@ -11,6 +11,6 @@ In this project, a simple library catalog system is implemented using text files
 | File | Content | Example |
 | -------- | -------- | -------- |
 | main.cpp | code | C++ code |
-| Author.txt | Author data records in sequential order separated with "|" | Author ID|Author Name|Address| |
-| Book.txt | Books data records in sequential order separated with "|" | ISBN|Book Title|Author ID |
+| Author.txt | Author data records in sequential order separated with a pipe | Author ID|Author Name|Address| |
+| Book.txt | Books data records in sequential order separated with a pipe | ISBN|Book Title|Author ID |
    
